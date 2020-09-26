@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30517.126
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hanu.ElectroLib", "Hanu.ElectroLib\Hanu.ElectroLib.csproj", "{3CAA37E3-626B-4A5A-9F29-9899EC54222A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3CAA37E3-626B-4A5A-9F29-9899EC54222A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3CAA37E3-626B-4A5A-9F29-9899EC54222A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3CAA37E3-626B-4A5A-9F29-9899EC54222A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3CAA37E3-626B-4A5A-9F29-9899EC54222A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D9BB37A6-486B-4307-8623-43DFAC7087A1}
+	EndGlobalSection
+EndGlobal
