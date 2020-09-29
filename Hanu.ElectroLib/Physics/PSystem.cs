@@ -90,7 +90,7 @@ namespace Hanu.ElectroLib.Physics
             Vector2 res = default;
             foreach (PhysicalObject obj in _pObjs)
             {
-                Vector2 disp = obj.Position - pos;
+                Vector2 disp = pos - obj.Position;
                 res += Constant.Coulomb * obj.Charge / (float)Math.Pow(disp.Length(), 3) * disp;
             }
             return res;
