@@ -1,5 +1,6 @@
 ﻿using Hanu.ElectroLib.ComponentModel;
 using Hanu.ElectroLib.Objects;
+using Hanu.ElectroLib.Exceptions;
 
 using System;
 using System.Collections;
@@ -13,27 +14,37 @@ namespace Hanu.ElectroLib.Physics
     /// <summary>
     /// A physical system of <see cref="PhysicalObject"/>s
     /// </summary>
-    public class PSystem : INotifyDeepCollectionChanged, ICollection<PhysicalObject>
+    public class PSystem : ICollection<PhysicalObject>
     {
         private readonly List<PhysicalObject> _pObjs;
-
-        private readonly List<PropertyChangedEventHandler> _handlers;
 
         public int Count => _pObjs.Count;
 
         public bool IsReadOnly => false;
 
-        public event NotifyDeepCollectionChangedEventHandler DeepCollectionChanged;
+        public PSystem()
+        {
+            _pObjs = new List<PhysicalObject>();
+        }
+
+        public PSystem(int capacity)
+        {
+            _pObjs = new List<PhysicalObject>(capacity);
+        }
 
         public PSystem(IEnumerable<PhysicalObject> objects)
         {
-            PhysicalObject[] objList = objects.ToArray();
-            _pObjs = new List<PhysicalObject>(objList.Length);
-            _handlers = new List<PropertyChangedEventHandler>(objList.Length);
-            foreach (PhysicalObject obj in objList)
+            var array = objects.ToArray();
+            _pObjs = new List<PhysicalObject>(array.Length);
+            Array.Sort(array, (a, b) => a.X.CompareTo(b.X));
+            for (int i = 0; i < array.Length - 1; ++i)
             {
-                Add(obj);
+                if (array[i].Position == array[i+1].Position)
+                {
+                    throw new PhysicalNonsenseException(PhysicalNonsenseType.DistanceZero);
+                }
             }
+            _pObjs.AddRange(objects);
         }
 
         IEnumerator IEnumerable.GetEnumerator()
@@ -48,45 +59,16 @@ namespace Hanu.ElectroLib.Physics
 
         public void Add(PhysicalObject item)
         {
-            void Item_PropertyChanged(object sender, PropertyChangedEventArgs e)
-                       => DeepCollectionChanged?.Invoke(sender,
-                           new NotifyDeepCollectionChangedEventArgs(
-                               NotifyDeepCollectionChangedAction.Modified,
-                               item,
-                               _pObjs.Count));
             _pObjs.Add(item);
-            _handlers.Add(Item_PropertyChanged);
-            DeepCollectionChanged?.Invoke(this,
-                new NotifyDeepCollectionChangedEventArgs(NotifyDeepCollectionChangedAction.Add, item, _pObjs.Count));
         }
 
-        public void Clear()
-        {
-            _pObjs.Clear();
-            _handlers.Clear();
-            DeepCollectionChanged?.Invoke(this,
-                new NotifyDeepCollectionChangedEventArgs(NotifyDeepCollectionChangedAction.Reset));
-        }
+        public void Clear() => _pObjs.Clear();
 
         public bool Contains(PhysicalObject item) => _pObjs.Contains(item);
 
         public void CopyTo(PhysicalObject[] array, int arrayIndex) => _pObjs.CopyTo(array, arrayIndex);
 
-        public bool Remove(PhysicalObject item)
-        {
-            int index = _pObjs.IndexOf(item);
-            if (index < 0)
-            {
-                return false;
-            }
-
-            PhysicalObject obj = _pObjs[index];
-            _pObjs.RemoveAt(index);
-            _handlers.RemoveAt(index);
-            DeepCollectionChanged?.Invoke(this,
-                new NotifyDeepCollectionChangedEventArgs(NotifyDeepCollectionChangedAction.Remove, obj, index));
-            return true;
-        }
+        public bool Remove(PhysicalObject item) => _pObjs.Remove(item);
 
         #region Physics Implementation
 

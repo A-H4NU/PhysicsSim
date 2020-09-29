@@ -30,7 +30,6 @@ namespace Hanu.ElectroLib.Objects
             set
             {
                 _position = value;
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Charge"));
             }
         }
 
@@ -41,7 +40,6 @@ namespace Hanu.ElectroLib.Objects
             set
             {
                 _charge = value;
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Charge"));
             }
         }
 
@@ -52,12 +50,9 @@ namespace Hanu.ElectroLib.Objects
             set
             {
                 _mass = value;
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Mass"));
             }
         }
 
         // TODO: implement velocity property
-
-        public override event PropertyChangedEventHandler PropertyChanged;
     }
 }

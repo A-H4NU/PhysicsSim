@@ -3,12 +3,10 @@ using System.Numerics;
 
 namespace Hanu.ElectroLib.Objects
 {
-    public abstract class PhysicalObject : INotifyPropertyChanged
+    public abstract class PhysicalObject
     {
         /// <summary> unit = m </summary>
         protected Vector2 _position;
-
-        public abstract event PropertyChangedEventHandler PropertyChanged;
 
         /// <summary> unit = m </summary>
         public abstract Vector2 Position { get; }

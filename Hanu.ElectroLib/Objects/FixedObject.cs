@@ -23,7 +23,6 @@ namespace Hanu.ElectroLib.Objects
             set
             {
                 _charge = value;
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Charge"));
             }
         }
 
@@ -34,10 +33,7 @@ namespace Hanu.ElectroLib.Objects
             set
             {
                 _mass = value;
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Mass"));
             }
         }
-
-        public override event PropertyChangedEventHandler PropertyChanged;
     }
 }
