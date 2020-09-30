@@ -1,5 +1,4 @@
-﻿using System.ComponentModel;
-using System.Numerics;
+﻿using MathNet.Numerics.LinearAlgebra;
 
 namespace Hanu.ElectroLib.Objects
 {
@@ -8,16 +7,16 @@ namespace Hanu.ElectroLib.Objects
     /// </summary>
     public class FixedObject : PhysicalObject
     {
-        public FixedObject(Vector2 position, float charge = 0, float mass = 0)
+        public FixedObject(Vector<double> position, double charge = 0, double mass = 0)
             : base(position, charge, mass)
         {
             return;
         }
 
-        public override Vector2 Position { get => _position; }
+        public override Vector<double> Position { get => _position; }
 
-        private float _charge;
-        public override float Charge
+        private double _charge;
+        public override double Charge
         {
             get => _charge;
             set
@@ -26,8 +25,8 @@ namespace Hanu.ElectroLib.Objects
             }
         }
 
-        private float _mass;
-        public override float Mass
+        private double _mass;
+        public override double Mass
         {
             get => _mass;
             set

@@ -1,18 +1,32 @@
-﻿using MathNet.Numerics.OdeSolvers;
-using MathNet.Numerics.LinearAlgebra;
+﻿using MathNet.Numerics.LinearAlgebra;
+using MathNet.Numerics.OdeSolvers;
 
-using System.Collections.Generic;
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace Hanu.ElectroLib.Physics
+namespace ElectroSim
 {
-    public static class PLine
+    class Program
     {
-        //public static IEnumerable<Vector<double>> ElectricFieldLine(PSystem system, Vector<double> initPos, double end, int n, double step = 1e-16f)
-        //{
-            
-        //}
+        static void Main(string[] args)
+        {
+            MainWindow mw = new MainWindow(1600, 900);
+            mw.Run(60);
+            mw.Close();
+
+            var y0 = CreateVector.Dense<double>(2);
+            y0[0] = 1;
+            var result = SecondOrder(y0, 0, f, endFunc);
+            Console.WriteLine(result.Last());
+        }
+
+        public static Vector<double> f(double t, Vector<double> y)
+            => CreateVector.Dense(new double[] { t + Math.Cos(t), t - Math.Sin(t) });
+
+        public static bool endFunc(Vector<double> y) => y.L2Norm() >= 10;
 
         public static List<Vector<double>> SecondOrder(Vector<double> y0, double start, Func<double, Vector<double>, Vector<double>> f, Func<Vector<double>, bool> endFunc, double delta = 1e-4)
         {

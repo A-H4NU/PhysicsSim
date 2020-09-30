@@ -1,8 +1,9 @@
 ﻿using Hanu.ElectroLib.Exceptions;
 using Hanu.ElectroLib.Objects;
 
+using MathNet.Numerics.LinearAlgebra;
+
 using System;
-using System.Numerics;
 
 namespace Hanu.ElectroLib.Physics
 {
@@ -12,45 +13,45 @@ namespace Hanu.ElectroLib.Physics
     /// </summary>
     public static class Force
     {
-        public static Vector2 Gravity(PhysicalObject on, PhysicalObject by)
+        public static Vector<double> Gravity(PhysicalObject on, PhysicalObject by)
         {
-            if (!TryGravity(on, by, out Vector2 force))
+            if (!TryGravity(on, by, out Vector<double> force))
             {
                 throw new PhysicalNonsenseException(PhysicalNonsenseType.DistanceZero);
             }
             return force;
         }
 
-        public static bool TryGravity(PhysicalObject on, PhysicalObject by, out Vector2 force)
+        public static bool TryGravity(PhysicalObject on, PhysicalObject by, out Vector<double> force)
         {
-            Vector2 d = by.Position - on.Position;
-            if (d == Vector2.Zero)
+            Vector<double> d = by.Position - on.Position;
+            if (d.L2Norm() == 0)
             {
-                force = Vector2.Zero;
+                force = CreateVector.Dense<double>(2);
                 return false;
             }
-            force = (Constant.Gravity * on.Mass * by.Mass / (float)Math.Pow(d.Length(), 3)) * d;
+            force = (Constant.Gravity * on.Mass * by.Mass / (double)Math.Pow(d.L2Norm(), 3)) * d;
             return true;
         }
 
-        public static Vector2 Electrostatic(PhysicalObject on, PhysicalObject by)
+        public static Vector<double> Electrostatic(PhysicalObject on, PhysicalObject by)
         {
-            if (!TryElectrostatic(on, by, out Vector2 force))
+            if (!TryElectrostatic(on, by, out Vector<double> force))
             {
                 throw new PhysicalNonsenseException(PhysicalNonsenseType.DistanceZero);
             }
             return force;
         }
 
-        public static bool TryElectrostatic(PhysicalObject on, PhysicalObject by, out Vector2 force)
+        public static bool TryElectrostatic(PhysicalObject on, PhysicalObject by, out Vector<double> force)
         {
-            Vector2 d = by.Position - on.Position;
-            if (d == Vector2.Zero)
+            Vector<double> d = by.Position - on.Position;
+            if (d.L2Norm() == 0)
             {
-                force = Vector2.Zero;
+                force = CreateVector.Dense<double>(2);
                 return false;
             }
-            force = Constant.Coulomb * on.Charge * by.Charge / (float)Math.Pow(d.Length(), 3) * d;
+            force = Constant.Coulomb * on.Charge * by.Charge / (double)Math.Pow(d.L2Norm(), 3) * d;
             return true;
         }
     }

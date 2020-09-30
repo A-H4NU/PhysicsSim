@@ -1,13 +1,12 @@
-﻿using Hanu.ElectroLib.ComponentModel;
+﻿using Hanu.ElectroLib.Exceptions;
 using Hanu.ElectroLib.Objects;
-using Hanu.ElectroLib.Exceptions;
+
+using MathNet.Numerics.LinearAlgebra;
 
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
-using System.Numerics;
 
 namespace Hanu.ElectroLib.Physics
 {
@@ -34,7 +33,7 @@ namespace Hanu.ElectroLib.Physics
 
         public PSystem(IEnumerable<PhysicalObject> objects)
         {
-            var array = objects.ToArray();
+            PhysicalObject[] array = objects.ToArray();
             _pObjs = new List<PhysicalObject>(array.Length);
             Array.Sort(array, (a, b) => a.X.CompareTo(b.X));
             for (int i = 0; i < array.Length - 1; ++i)
@@ -75,8 +74,8 @@ namespace Hanu.ElectroLib.Physics
         /// <summary>
         /// Provide a function that returns electric field of the system
         /// </summary>
-        /// <returns>Electric field(<see cref="Vector2"/>) with input of position(<see cref="Vector2"/>)</returns>
-        public Func<Vector2, Vector2> GetElectricFieldFunc()
+        /// <returns>Electric field(<see cref="Vector<double>"/>) with input of position(<see cref="Vector<double>"/>)</returns>
+        public Func<Vector<double>, Vector<double>> GetElectricFieldFunc()
         {
             return (pos) => GetElectricFieldAt(pos);
         }
@@ -85,13 +84,13 @@ namespace Hanu.ElectroLib.Physics
         /// Provide the electric field at a certain position in the system
         /// </summary>
         /// <returns>electric field at a certain position in the system</returns>
-        public Vector2 GetElectricFieldAt(Vector2 pos)
+        public Vector<double> GetElectricFieldAt(Vector<double> pos)
         {
-            Vector2 res = default;
+            Vector<double> res = default;
             foreach (PhysicalObject obj in _pObjs)
             {
-                Vector2 disp = pos - obj.Position;
-                res += Constant.Coulomb * obj.Charge / (float)Math.Pow(disp.Length(), 3) * disp;
+                Vector<double> disp = pos - obj.Position;
+                res += Constant.Coulomb * obj.Charge / Math.Pow(disp.L2Norm(), 3) * disp;
             }
             return res;
         }
@@ -99,8 +98,8 @@ namespace Hanu.ElectroLib.Physics
         /// <summary>
         /// Provide a function that returns voltage of the system
         /// </summary>
-        /// <returns>Voltage(<see cref="Single"/>) with input of position(<see cref="Vector2"/>)</returns>
-        public Func<Vector2, float> GetVoltageFunc()
+        /// <returns>Voltage(<see cref="Single"/>) with input of position(<see cref="Vector<double>"/>)</returns>
+        public Func<Vector<double>, double> GetVoltageFunc()
         {
             return (pos) => GetVoltageAt(pos);
         }
@@ -109,10 +108,10 @@ namespace Hanu.ElectroLib.Physics
         /// Provide the voltage at a certain position in the system
         /// </summary>
         /// <returns>voltage at a certain position in the system</returns>
-        public float GetVoltageAt(Vector2 pos)
+        public double GetVoltageAt(Vector<double> pos)
         {
             return (from obj in _pObjs
-                    select Constant.Coulomb * obj.Charge / (pos - obj.Position).Length()).Sum();
+                    select Constant.Coulomb * obj.Charge / (pos - obj.Position).L2Norm()).Sum();
         }
 
         #endregion
