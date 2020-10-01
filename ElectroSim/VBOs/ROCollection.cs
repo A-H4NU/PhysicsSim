@@ -11,14 +11,14 @@ namespace ElectroSim.VBOs
 {
     public class ROCollection : ARenderable
     {
-        private List<RenderObject> _rObj;
+        private List<ARenderable> _rObj;
 
-        public ROCollection()
+        private ROCollection()
         {
-            _rObj = new List<RenderObject>();
+            _rObj = new List<ARenderable>();
         }
 
-        public ROCollection(IEnumerable<RenderObject> renderObjects) : this()
+        public ROCollection(IEnumerable<ARenderable> renderObjects) : this()
         {
             _rObj.AddRange(renderObjects);
         }
@@ -37,7 +37,11 @@ namespace ElectroSim.VBOs
         {
             foreach (var ro in _rObj)
             {
-                ro.Render(ref projection, translation, rotation, scale);
+                ro.Render(
+                    ref projection,
+                    translation + Position,
+                    rotation + Rotation,
+                    scale * Scale);
             }
         }
     }

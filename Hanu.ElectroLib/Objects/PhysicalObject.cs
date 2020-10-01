@@ -1,27 +1,32 @@
 ﻿using MathNet.Numerics.LinearAlgebra;
 
+using System.ComponentModel;
+using System.Numerics;
+
 namespace Hanu.ElectroLib.Objects
 {
-    public abstract class PhysicalObject
+    public abstract class PhysicalObject : INotifyPropertyChanged
     {
         /// <summary> unit = m </summary>
-        protected Vector<double> _position;
+        protected Vector2 _position;
+
+        public abstract event PropertyChangedEventHandler PropertyChanged;
 
         /// <summary> unit = m </summary>
-        public abstract Vector<double> Position { get; }
+        public abstract Vector2 Position { get; }
 
         /// <summary> unit = C </summary>
-        public abstract double Charge { get; set; }
+        public abstract float Charge { get; set; }
 
         /// <summary> unit = kg </summary>
-        public abstract double Mass { get; set; }
+        public abstract float Mass { get; set; }
 
         /// <summary> unit = m </summary>
-        public double X => _position[0];
+        public float X => _position.X;
         /// <summary> unit = m </summary>
-        public double Y => _position[1];
+        public float Y => _position.Y;
 
-        public PhysicalObject(Vector<double> position, double charge = 0, double mass = 0)
+        public PhysicalObject(Vector2 position, float charge = 0, float mass = 0)
         {
             _position = position;
             Charge = charge;

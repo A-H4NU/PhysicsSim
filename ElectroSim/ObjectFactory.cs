@@ -16,25 +16,70 @@ namespace ElectroSim
 {
     public static class ObjectFactory
     {
-        public static (ColoredVertex[], PrimitiveType) FilledCircle(float radius, Color4 color, int precision = 100)
+        public static (ColoredVertex[], PrimitiveType) FilledCircle(
+            float radius,
+            Color4 color,
+            int precision = 100)
         {
-            ColoredVertex[] result = new ColoredVertex[3 * precision];
-            for (int i = 0; i < precision; ++i)
+            ColoredVertex[] result = new ColoredVertex[precision + 2];
+            result[0] = new ColoredVertex(new Vector4(0, 0, 0, 1), color);
+            for (int i = 0; i <= precision; ++i)
             {
-                result[3*i+0] = new ColoredVertex(new Vector4(0, 0, 0, 1), color);
-                result[3*i+1] = new ColoredVertex(new Vector4(
-                    (float)(radius * Math.Cos(2*i*Math.PI / precision)),
-                    (float)(radius * Math.Sin(2*i*Math.PI / precision)),
-                    0, 1), color);
-                result[3*i+2] = new ColoredVertex(new Vector4(
-                    (float)(radius * Math.Cos(2*(i+1)*Math.PI / precision)),
-                    (float)(radius * Math.Sin(2*(i+1)*Math.PI / precision)),
-                    0, 1), color);
+                result[i+1] = new ColoredVertex(
+                    new Vector4(
+                        radius * (float)Math.Cos(2*i*Math.PI / precision),
+                        radius * (float)Math.Sin(2*i*Math.PI / precision), 0, 1), color);
             }
-            return (result, PrimitiveType.Triangles);
+            return (result, PrimitiveType.TriangleFan);
         }
 
-        public static (ColoredVertex[], PrimitiveType) Rectangle(float width, float height, Color4 color)
+        public enum BorderType
+        {
+            Inner, Middle, Outter
+        }
+
+        public static (ColoredVertex[], PrimitiveType) HollowCircle(
+            float radius,
+            float thickness,
+            Color4 color,
+            BorderType borderType = BorderType.Inner,
+            int precision = 100)
+        {
+            float outrad = 0f, inrad = 0f;
+            if (borderType == BorderType.Inner)
+            {
+                outrad = radius;
+                inrad = radius - thickness;
+            }
+            else if (borderType == BorderType.Middle)
+            {
+                outrad = radius + thickness / 2;
+                inrad = radius - thickness / 2;
+            }
+            else if (borderType == BorderType.Outter)
+            {
+                outrad = radius + thickness;
+                inrad = radius;
+            }
+            ColoredVertex[] result = new ColoredVertex[2 * precision + 2];
+            for (int i = 0; i <= precision; ++i)
+            {
+                result[2*i+0] = new ColoredVertex(
+                    new Vector4(
+                        outrad * (float)Math.Cos(2*i*Math.PI / precision),
+                        outrad * (float)Math.Sin(2*i*Math.PI / precision), 0, 1), color);
+                result[2*i+1] = new ColoredVertex(
+                    new Vector4(
+                        inrad * (float)Math.Cos(2*i*Math.PI / precision),
+                        inrad * (float)Math.Sin(2*i*Math.PI / precision), 0, 1), color);
+            }
+            return (result, PrimitiveType.TriangleStrip);
+        }
+
+        public static (ColoredVertex[], PrimitiveType) Rectangle(
+            float width,
+            float height,
+            Color4 color)
         {
             width /= 2; height /= 2;
             ColoredVertex[] result = new ColoredVertex[]
@@ -49,7 +94,9 @@ namespace ElectroSim
             return (result, PrimitiveType.Triangles);
         }
 
-        public static (ColoredVertex[], PrimitiveType) Curve(List<Vector<double>> curve, Color4 color)
+        public static (ColoredVertex[], PrimitiveType) Curve(
+            List<Vector2> curve,
+            Color4 color)
         {
             ColoredVertex[] result = new ColoredVertex[curve.Count];
             for (int i = 0; i < result.Length; ++i)

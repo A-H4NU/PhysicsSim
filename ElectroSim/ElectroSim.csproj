@@ -59,6 +59,7 @@
     <Compile Include="VBOs\ARenderable.cs" />
     <Compile Include="VBOs\RenderObject.cs" />
     <Compile Include="VBOs\ROCollection.cs" />
+    <Compile Include="VBOs\RPhysicalObject.cs" />
     <Compile Include="Vertices\ColoredVertex.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -71,6 +72,12 @@
     <None Include="Shaders\vertex_shader.vert">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Hanu.ElectroLib\Hanu.ElectroLib.csproj">
+      <Project>{3CAA37E3-626B-4A5A-9F29-9899EC54222A}</Project>
+      <Name>Hanu.ElectroLib</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

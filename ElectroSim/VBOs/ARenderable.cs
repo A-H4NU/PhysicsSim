@@ -20,9 +20,9 @@ namespace ElectroSim.VBOs
 
         public abstract void Render(ref Matrix4 projection, Vector3 translation, Vector3 rotation, Vector3 scale);
 
-        protected virtual Matrix4 GetModelView() => GetModelView(Vector3.Zero, Vector3.Zero, Vector3.One);
+        public virtual Matrix4 GetModelView() => GetModelView(Vector3.Zero, Vector3.Zero, Vector3.One);
 
-        protected virtual Matrix4 GetModelView(Vector3 translation, Vector3 rotation, Vector3 scale)
+        public virtual Matrix4 GetModelView(Vector3 translation, Vector3 rotation, Vector3 scale)
         {
             Matrix4 t = Matrix4.CreateTranslation(Position + translation);
             Matrix4 r = Matrix4.CreateRotationX(Rotation.X + rotation.X)

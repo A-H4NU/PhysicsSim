@@ -1,10 +1,13 @@
 ﻿using MathNet.Numerics.LinearAlgebra;
 
+using System.ComponentModel;
+using System.Numerics;
+
 namespace Hanu.ElectroLib.Objects
 {
     public class MovableObject : PhysicalObject
     {
-        public MovableObject(Vector<double> position, double charge = 0, double mass = 0)
+        public MovableObject(Vector2 position, float charge = 0, float mass = 0)
             : base(position, charge, mass)
         {
             return;
@@ -14,7 +17,7 @@ namespace Hanu.ElectroLib.Objects
         /// unit = m
         /// <para> To modify this, use <see cref="Position"/> </para>
         /// </summary>
-        public override Vector<double> Position
+        public override Vector2 Position
         {
             get => _position;
         }
@@ -23,32 +26,38 @@ namespace Hanu.ElectroLib.Objects
         /// unit = m
         /// <para> Modifiable property of <see cref="Position"/> </para>
         /// </summary>
-        public Vector<double> PositionM
+        public Vector2 PositionM
         {
             get => _position;
             set
             {
                 _position = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Position"));
             }
         }
 
-        private double _charge;
-        public override double Charge
+        private float _charge;
+        public override float Charge
         {
             get => _charge;
             set
             {
                 _charge = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Charge"));
             }
         }
 
-        private double _mass;
-        public override double Mass
+        private float _mass;
+
+        public override event PropertyChangedEventHandler PropertyChanged;
+
+        public override float Mass
         {
             get => _mass;
             set
             {
                 _mass = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Mass"));
             }
         }
 

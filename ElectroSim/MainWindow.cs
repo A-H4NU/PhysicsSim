@@ -1,6 +1,9 @@
 ﻿using ElectroSim.VBOs;
 using ElectroSim.Vertices;
 
+using Hanu.ElectroLib.Objects;
+using Hanu.ElectroLib.Physics;
+
 using MathNet.Numerics.LinearAlgebra;
 
 using OpenTK;
@@ -10,10 +13,12 @@ using OpenTK.Input;
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Timers;
 
 namespace ElectroSim
 {
@@ -21,88 +26,35 @@ namespace ElectroSim
     {
         private List<ARenderable> _renderables;
 
+        private List<RPhysicalObject> _pObjs;
+
         private int _program;
+
+        private Timer _timer;
 
         public MainWindow(int width, int height)
             : base(width, height, new GraphicsMode(32, 24, 0, 8), "ElectroSim", GameWindowFlags.Default, DisplayDevice.Default)
         {
-            return;
+            _timer = new Timer(1000);
+            _timer.Elapsed += (o, e) =>
+            {
+                Console.WriteLine($"total memory using at {e.SignalTime:HH:mm:ss:fff}: {GC.GetTotalMemory(true)} bytes");
+            };
+            _timer.Start();
         }
 
         #region OpenTK Events
 
         protected override void OnLoad(EventArgs e)
         {
-            GL.ClearColor(Color4.Aqua);
+            GL.ClearColor(new Color4(0.1f, 0.1f, 0.4f, 1.0f));
 
             _program = CreateProgram();
-            _renderables = new List<ARenderable>(100);
-            //Random random = new Random();
-            //for (int i = 0; i < 50; ++i)
-            //{
-            //    var r = new RenderObject(ObjectFactory.FilledCircle(10f, Color4.Blue))
-            //    {
-            //        Position = new Vector3(random.Next(-Width / 2, Width / 2), random.Next(-Height / 2, Height / 2), 0)
-            //    };
-            //    _renderables.Add(r);
-            //}
-            //for (int i = 0; i < 50; ++i)
-            //{
-            //    var r = new RenderObject(ObjectFactory.FilledCircle(10f, Color4.Red))
-            //    {
-            //        Position = new Vector3(random.Next(-Width / 2, Width / 2), random.Next(-Height / 2, Height / 2), 0)
-            //    };
-            //    _renderables.Add(r);
-            //}
-
-            var y0 = CreateVector.Dense<double>(2);
-            y0[0] = 0.01;
-            var result = SecondOrder(y0, 0, f, endFunc);
-
-            var newr = new List<Vector<double>>(result.Count);
-            for (int i = 0; i < result.Count; ++i)
-            {
-                var add = CreateVector.Dense(
-                    new double[] { (double)i / result.Count, result[i][0] }
-                    );
-                newr.Add(add);
-            }
-
-            _renderables.Add(new RenderObject(ObjectFactory.Curve(newr, Color4.Black))
-            {
-                Scale = new Vector3(100)
-            }) ;
-
+            _renderables = new List<ARenderable>();
+            _pObjs = new List<RPhysicalObject>();
             GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Fill);
             GL.PatchParameter(PatchParameterInt.PatchVertices, 3);
         }
-
-        /***************************   DELETE THIS **************************************************/
-
-        public static Vector<double> f(double t, Vector<double> y)
-            //=> CreateVector.Dense(new double[] { t + Math.Cos(t), t - Math.Sin(t) });
-            => y;
-
-        public static bool endFunc(Vector<double> y) => y.L2Norm() >= 5;
-
-        public static List<Vector<double>> SecondOrder(Vector<double> y0, double start, Func<double, Vector<double>, Vector<double>> f, Func<Vector<double>, bool> endFunc, double delta = 1e-4)
-        {
-            double num = delta;
-            List<Vector<double>> vectorArrays = new List<Vector<double>>();
-            double num1 = start;
-            vectorArrays.Add(y0);
-            while (endFunc(vectorArrays.Last()) == false)
-            {
-                Vector<double> nums = f(num1, y0);
-                Vector<double> nums1 = f(num1, y0 + (nums * num));
-                vectorArrays.Add(y0 + (num * 0.5 * (nums + nums1)));
-                num1 += num;
-                y0 = vectorArrays.Last();
-            }
-            return vectorArrays;
-        }
-
-        /********************************************************************************************/
 
         protected override void OnResize(EventArgs e)
         {
@@ -111,7 +63,7 @@ namespace ElectroSim
 
         protected override void OnUpdateFrame(FrameEventArgs e)
         {
-            HandleKeyboard();
+            HandleInput();
         }
 
         protected override void OnRenderFrame(FrameEventArgs e)
@@ -124,13 +76,19 @@ namespace ElectroSim
             {
                 render.Render(ref projection);
             }
+            foreach (var obj in _pObjs)
+            {
+                obj.Render(ref projection);
+            }
 
             SwapBuffers();
         }
 
         #endregion
 
-        private void HandleKeyboard()
+        #region Input Handling
+
+        private void HandleInput()
         {
             KeyboardState state = Keyboard.GetState();
             if (state.IsKeyDown(Key.Escape))
@@ -138,6 +96,24 @@ namespace ElectroSim
                 Close();
             }
         }
+
+        protected override void OnMouseDown(MouseButtonEventArgs e)
+        {
+            var pos = this.ScreenToCoord(e.X, e.Y);
+            if (e.Button == MouseButton.Left)
+            {
+                var obj = new FixedObject(pos);
+                _pObjs.Add(new RPhysicalObject(obj));
+                Console.WriteLine($"Added object at {pos}");
+            }
+        }
+
+        protected override void OnMouseWheel(MouseWheelEventArgs e)
+        {
+            _pObjs.Last().PObject.Charge += e.Delta * 1e-6f;
+        }
+
+        #endregion
 
         #region Shader Handling
 
@@ -190,6 +166,29 @@ namespace ElectroSim
                 Console.WriteLine($"{v1,15}{v2,15}");
             }
             return (double)Math.Sqrt(res);
+        }
+
+        private System.Numerics.Vector2 ScreenToCoord(int x, int y)
+            => new System.Numerics.Vector2(
+                x -Width / 2f,
+                -y + Height / 2f
+                );
+
+        protected override void OnClosed(EventArgs e)
+        {
+            foreach (var obj in _renderables)
+            {
+                obj.Dispose();
+            }
+            foreach (var obj in _pObjs)
+            {
+                obj.Dispose();
+            }
+            _renderables.Clear();
+            _pObjs.Clear();
+            _renderables = null;
+            _pObjs = null;
+            GC.Collect();
         }
     }
 }
