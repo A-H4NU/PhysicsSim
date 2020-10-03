@@ -27,8 +27,7 @@ namespace Hanu.ElectroLib.Physics
             List<Vector2> vectorArrays = new List<Vector2>();
             float num1 = 0f;
             vectorArrays.Add(initPos);
-            while (!endFunc(num1, vectorArrays.Last()) &&
-                f(num1, vectorArrays.Last()).LengthSquared() >= delta * delta)
+            while (!endFunc(num1, vectorArrays.Last()))
             {
                 Vector2 nums = f(num1, initPos);
                 Vector2 nums1 = f(num1, initPos + (nums * delta));
@@ -72,22 +71,6 @@ namespace Hanu.ElectroLib.Physics
             d /= d.Length();
             return (pp1 - Vector2.Dot(pp1, d) * d).Length();
             
-        }
-
-        public static List<Vector2> SecondOrder(Vector2 initPos, float start, Func<float, Vector2, Vector2> f, Func<float, Vector2, bool> endFunc, float delta = 1e-5f)
-        {
-            List<Vector2> vectorArrays = new List<Vector2>();
-            float num1 = start;
-            vectorArrays.Add(initPos);
-            while (!endFunc(num1, vectorArrays.Last()) && vectorArrays.Last().X != Single.NaN && vectorArrays.Last().Y != Single.NaN)
-            {
-                Vector2 nums = f(num1, initPos);
-                Vector2 nums1 = f(num1, initPos + (nums * delta));
-                vectorArrays.Add(initPos + (delta * 0.5f * (nums + nums1)));
-                num1 += delta;
-                initPos = vectorArrays.Last();
-            }
-            return vectorArrays;
         }
     }
 }

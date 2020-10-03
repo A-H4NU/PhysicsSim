@@ -11,6 +11,7 @@ using OpenTK.Input;
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -28,7 +29,7 @@ namespace ElectroSim
 
         public static float MaxT = 100f;
 
-        public static int LinePerUnitCharge = 10;
+        public static int LinePerUnitCharge = 6;
 
         private List<ARenderable> _renderables;
 
@@ -41,7 +42,7 @@ namespace ElectroSim
         public MainWindow(int width, int height)
             : base(width, height, new GraphicsMode(32, 24, 0, 8), "ElectroSim", GameWindowFlags.Default, DisplayDevice.Default)
         {
-            _timer = new Timer(10000);
+            _timer = new Timer(5000);
             _timer.Elapsed += (o, e) => Console.WriteLine($"total memory using at {e.SignalTime:HH:mm:ss:fff}: {GC.GetTotalMemory(true)} bytes");
             _timer.Start();
         }
@@ -55,6 +56,7 @@ namespace ElectroSim
             _program = CreateProgram();
             _renderables = new List<ARenderable>();
             _pObjs = new List<RPhysicalObject>();
+
             GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Fill);
             GL.PatchParameter(PatchParameterInt.PatchVertices, 3);
             
@@ -135,9 +137,16 @@ namespace ElectroSim
             {
                 if (_pObjs.Extracted().Any((p) => p.Charge != 0))
                 {
+                    Stopwatch stopwatch = new Stopwatch();
+                    stopwatch.Start();
                     _renderables.Clear();
-                    var tasklist = new List<Task<List<System.Numerics.Vector2>>>();
-                    DateTime start = DateTime.Now;
+                    int linecount = 0;
+                    foreach (var obj in _pObjs)
+                    {
+                        if (obj.PObject.Charge <= 0) continue;
+                        linecount += (int)(obj.PObject.Charge / 1e-6f) * LinePerUnitCharge;
+                    }
+                    var taskList = new List<Task<List<System.Numerics.Vector2>>>(linecount);
                     foreach (var obj in _pObjs)
                     {
                         if (obj.PObject.Charge < 0) continue;
@@ -147,24 +156,26 @@ namespace ElectroSim
                             double angle = 2*i*Math.PI / (units*LinePerUnitCharge);
                             var delta = new System.Numerics.Vector2(
                                 (float)Math.Cos(angle), (float)Math.Sin(angle)) * RPhysicalObject.Radius / Scale;
-                            tasklist.Add(PLine.ElectricFieldLineAsync(
+                            var task = PLine.ElectricFieldLineAsync(
                                 system: _pObjs.Extracted(),
                                 initPos: obj.PObject.Position + delta,
                                 endFunc: (t, v)
                                     => t > MaxT ||
                                     !(-Width / Scale < v.X && v.X < Width / Scale && -Height / Scale < v.Y && v.Y < Height / Scale),
                                 startFromNegative: false,
-                                delta: 1e-3f));
+                                delta: 1e-3f);
+                            taskList.Add(task);
                         }
                     }
-                    Task.WaitAll(tasklist.ToArray());
-                    foreach (var task in tasklist)
+                    while (taskList.Any())
                     {
-                        _renderables.Add(new RenderObject(
-                            ObjectFactory.Curve(task.Result, Color4.White)) {Scale = new Vector3(Scale, Scale, 1) });
+                        var finished = await Task.WhenAny(taskList);
+                        taskList.Remove(finished);
+                        var result = await finished;
+                        _renderables.Add(new RenderObject(ObjectFactory.Curve(result, Color4.White)) { Scale = new Vector3(Scale, Scale, 1) });
                     }
-                    DateTime end = DateTime.Now;
-                    Console.WriteLine($"Time elapsed: {(end - start).TotalMilliseconds} ms");
+                    stopwatch.Stop();
+                    Console.WriteLine($"Time elapsed: {stopwatch.ElapsedMilliseconds} ms");
                 }
             }
         }
