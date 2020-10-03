@@ -1,16 +1,11 @@
 ﻿using ElectroSim.Vertices;
 
-using MathNet.Numerics.LinearAlgebra;
-
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL4;
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ElectroSim
 {
@@ -19,7 +14,7 @@ namespace ElectroSim
         public static (ColoredVertex[], PrimitiveType) FilledCircle(
             float radius,
             Color4 color,
-            int precision = 100)
+            int precision = 30)
         {
             ColoredVertex[] result = new ColoredVertex[precision + 2];
             result[0] = new ColoredVertex(new Vector4(0, 0, 0, 1), color);
@@ -43,7 +38,7 @@ namespace ElectroSim
             float thickness,
             Color4 color,
             BorderType borderType = BorderType.Inner,
-            int precision = 100)
+            int precision = 30)
         {
             float outrad = 0f, inrad = 0f;
             if (borderType == BorderType.Inner)
@@ -95,30 +90,15 @@ namespace ElectroSim
         }
 
         public static (ColoredVertex[], PrimitiveType) Curve(
-            List<Vector2> curve,
+            List<System.Numerics.Vector2> curve,
             Color4 color)
         {
             ColoredVertex[] result = new ColoredVertex[curve.Count];
             for (int i = 0; i < result.Length; ++i)
             {
-                result[i] = new ColoredVertex(new Vector4((float)curve[i][0], (float)curve[i][1], 0, 1), color);
+                result[i] = new ColoredVertex(new Vector4(curve[i].X, curve[i].Y, 0, 1), color);
             }
             return (result, PrimitiveType.LineStrip);
-        }
-
-        private static ColoredVertex[] FromTriangleFan(ColoredVertex[] vertices)
-        {
-            List<ColoredVertex> result = new List<ColoredVertex>(3*vertices.Length - 6)
-            {
-                vertices[0], vertices[1], vertices[2]
-            };
-            for (int i = 3; i < vertices.Length; ++i)
-            {
-                result.Add(vertices[0]);
-                result.Add(vertices[i-1]);
-                result.Add(vertices[i]);
-            }
-            return result.ToArray();
         }
     }
 }

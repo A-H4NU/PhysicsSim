@@ -1,8 +1,6 @@
 ﻿using Hanu.ElectroLib.Exceptions;
 using Hanu.ElectroLib.Objects;
 
-using MathNet.Numerics.LinearAlgebra;
-
 using System;
 using System.Numerics;
 

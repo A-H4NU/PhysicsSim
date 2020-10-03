@@ -4,10 +4,6 @@ using OpenTK;
 using OpenTK.Graphics.OpenGL4;
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ElectroSim.VBOs
 {
@@ -21,7 +17,7 @@ namespace ElectroSim.VBOs
 
         public RenderObject((ColoredVertex[] vertices, PrimitiveType renderType) tuple)
         {
-            var vertices = tuple.vertices;
+            ColoredVertex[] vertices = tuple.vertices;
             _renderType = tuple.renderType;
             _verticeCount = vertices.Length;
 
@@ -62,11 +58,10 @@ namespace ElectroSim.VBOs
             _initialized = true;
         }
 
-        public override void Render(ref Matrix4 projection, Vector3 translation, Vector3 rotation, Vector3 scale)
+        public override void Render(Vector3 translation, Vector3 rotation, Vector3 scale)
         {
             Matrix4 modelview = GetModelView(translation, rotation, scale);
-            GL.UniformMatrix4(10, false, ref modelview);
-            GL.UniformMatrix4(11, false, ref projection);
+            GL.UniformMatrix4(MainWindow.ModelviewLocation, false, ref modelview);
             GL.BindVertexArray(_vertexArray);
             GL.BindBuffer(BufferTarget.ArrayBuffer, _buffer);
             GL.DrawArrays(_renderType, 0, _verticeCount);

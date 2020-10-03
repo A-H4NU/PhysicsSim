@@ -1,10 +1,6 @@
 ﻿using OpenTK;
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ElectroSim.VBOs
 {
@@ -16,12 +12,31 @@ namespace ElectroSim.VBOs
 
         public abstract void Dispose();
 
-        public virtual void Render(ref Matrix4 projection) => Render(ref projection, Vector3.Zero, Vector3.Zero, Vector3.One);
+        /// <summary>
+        /// Render with no additional transition, rotation, or scaling
+        /// </summary>
+        public virtual void Render() => Render(Vector3.Zero, Vector3.Zero, Vector3.One);
 
-        public abstract void Render(ref Matrix4 projection, Vector3 translation, Vector3 rotation, Vector3 scale);
+        /// <summary>
+        /// Render with additional transition, rotation, or scaling
+        /// </summary>
+        /// <param name="translation">additional transition</param>
+        /// <param name="rotation">additional rotation</param>
+        /// <param name="scale">additional scaling</param>
+        public abstract void Render(Vector3 translation, Vector3 rotation, Vector3 scale);
 
+        /// <summary>
+        /// Return new modelview matrix with no additional transition, rotation, or scaling
+        /// </summary>
         public virtual Matrix4 GetModelView() => GetModelView(Vector3.Zero, Vector3.Zero, Vector3.One);
 
+        /// <summary>
+        /// Return new modelview matrix with additional transition, rotation, or scaling
+        /// </summary>
+        /// <param name="translation">additional transition</param>
+        /// <param name="rotation">additional rotation</param>
+        /// <param name="scale">additional scaling</param>
+        /// <returns></returns>
         public virtual Matrix4 GetModelView(Vector3 translation, Vector3 rotation, Vector3 scale)
         {
             Matrix4 t = Matrix4.CreateTranslation(Position + translation);

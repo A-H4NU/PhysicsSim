@@ -1,6 +1,4 @@
-﻿using MathNet.Numerics.LinearAlgebra;
-
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Numerics;
 
 namespace Hanu.ElectroLib.Objects

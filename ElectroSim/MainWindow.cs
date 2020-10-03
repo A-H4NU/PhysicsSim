@@ -4,8 +4,6 @@ using ElectroSim.Vertices;
 using Hanu.ElectroLib.Objects;
 using Hanu.ElectroLib.Physics;
 
-using MathNet.Numerics.LinearAlgebra;
-
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL4;
@@ -13,10 +11,8 @@ using OpenTK.Input;
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Timers;
 
@@ -24,22 +20,29 @@ namespace ElectroSim
 {
     public sealed class MainWindow : GameWindow
     {
+        public static int ModelviewLocation = 10;
+
+        public static int ProjectionLocation = 11;
+
+        public static float Scale = 50f;
+
+        public static float MaxT = 100f;
+
+        public static int LinePerUnitCharge = 10;
+
         private List<ARenderable> _renderables;
 
         private List<RPhysicalObject> _pObjs;
 
         private int _program;
 
-        private Timer _timer;
+        private readonly Timer _timer;
 
         public MainWindow(int width, int height)
             : base(width, height, new GraphicsMode(32, 24, 0, 8), "ElectroSim", GameWindowFlags.Default, DisplayDevice.Default)
         {
-            _timer = new Timer(1000);
-            _timer.Elapsed += (o, e) =>
-            {
-                Console.WriteLine($"total memory using at {e.SignalTime:HH:mm:ss:fff}: {GC.GetTotalMemory(true)} bytes");
-            };
+            _timer = new Timer(10000);
+            _timer.Elapsed += (o, e) => Console.WriteLine($"total memory using at {e.SignalTime:HH:mm:ss:fff}: {GC.GetTotalMemory(true)} bytes");
             _timer.Start();
         }
 
@@ -54,6 +57,7 @@ namespace ElectroSim
             _pObjs = new List<RPhysicalObject>();
             GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Fill);
             GL.PatchParameter(PatchParameterInt.PatchVertices, 3);
+            
         }
 
         protected override void OnResize(EventArgs e)
@@ -63,32 +67,49 @@ namespace ElectroSim
 
         protected override void OnUpdateFrame(FrameEventArgs e)
         {
-            HandleInput();
+            HandleKeyboard();
         }
 
         protected override void OnRenderFrame(FrameEventArgs e)
         {
             GL.Clear(ClearBufferMask.ColorBufferBit);
 
-            Matrix4 projection = GetProjection();
             GL.UseProgram(_program);
-            foreach (var render in _renderables)
+            Matrix4 projection = GetProjection();
+            GL.UniformMatrix4(ProjectionLocation, false, ref projection);
+            foreach (ARenderable render in _renderables)
             {
-                render.Render(ref projection);
+                render.Render();
             }
-            foreach (var obj in _pObjs)
+            foreach (RPhysicalObject obj in _pObjs)
             {
-                obj.Render(ref projection);
+                obj.Render();
             }
 
             SwapBuffers();
+        }
+        protected override void OnClosed(EventArgs e)
+        {
+            foreach (ARenderable obj in _renderables)
+            {
+                obj.Dispose();
+            }
+            foreach (RPhysicalObject obj in _pObjs)
+            {
+                obj.Dispose();
+            }
+            _renderables.Clear();
+            _pObjs.Clear();
+            _renderables = null;
+            _pObjs = null;
+            GC.Collect();
         }
 
         #endregion
 
         #region Input Handling
 
-        private void HandleInput()
+        private void HandleKeyboard()
         {
             KeyboardState state = Keyboard.GetState();
             if (state.IsKeyDown(Key.Escape))
@@ -97,20 +118,83 @@ namespace ElectroSim
             }
         }
 
+        protected async override void OnKeyDown(KeyboardKeyEventArgs e)
+        {
+            if (e.Key == Key.F11)
+            {
+                if (WindowState != WindowState.Fullscreen)
+                {
+                    WindowState = WindowState.Fullscreen;
+                }
+                else
+                {
+                    WindowState = WindowState.Normal;
+                }
+            }
+            if (e.Key == Key.F && !e.IsRepeat)
+            {
+                if (_pObjs.Extracted().Any((p) => p.Charge != 0))
+                {
+                    _renderables.Clear();
+                    var tasklist = new List<Task<List<System.Numerics.Vector2>>>();
+                    DateTime start = DateTime.Now;
+                    foreach (var obj in _pObjs)
+                    {
+                        if (obj.PObject.Charge < 0) continue;
+                        int units = (int)(obj.PObject.Charge / 1e-6f);
+                        for (int i = 0; i < units * LinePerUnitCharge; ++i)
+                        {
+                            double angle = 2*i*Math.PI / (units*LinePerUnitCharge);
+                            var delta = new System.Numerics.Vector2(
+                                (float)Math.Cos(angle), (float)Math.Sin(angle)) * RPhysicalObject.Radius / Scale;
+                            tasklist.Add(PLine.ElectricFieldLineAsync(
+                                system: _pObjs.Extracted(),
+                                initPos: obj.PObject.Position + delta,
+                                endFunc: (t, v)
+                                    => t > MaxT ||
+                                    !(-Width / Scale < v.X && v.X < Width / Scale && -Height / Scale < v.Y && v.Y < Height / Scale),
+                                startFromNegative: false,
+                                delta: 1e-3f));
+                        }
+                    }
+                    Task.WaitAll(tasklist.ToArray());
+                    foreach (var task in tasklist)
+                    {
+                        _renderables.Add(new RenderObject(
+                            ObjectFactory.Curve(task.Result, Color4.White)) {Scale = new Vector3(Scale, Scale, 1) });
+                    }
+                    DateTime end = DateTime.Now;
+                    Console.WriteLine($"Time elapsed: {(end - start).TotalMilliseconds} ms");
+                }
+            }
+        }
+
         protected override void OnMouseDown(MouseButtonEventArgs e)
         {
-            var pos = this.ScreenToCoord(e.X, e.Y);
+            System.Numerics.Vector2 pos = ScreenToCoord(e.X, e.Y);
             if (e.Button == MouseButton.Left)
             {
-                var obj = new FixedObject(pos);
+                pos /= Scale;
+                FixedObject obj = new FixedObject(pos);
                 _pObjs.Add(new RPhysicalObject(obj));
                 Console.WriteLine($"Added object at {pos}");
+            }
+            if (e.Button == MouseButton.Right)
+            {
+                if (_pObjs.Count != 0)
+                {
+                    var ef = PSystem.GetElectricFieldAt(_pObjs.Extracted(), pos);
+                    Console.WriteLine($"Electric field at {pos}: {ef}");
+                }
             }
         }
 
         protected override void OnMouseWheel(MouseWheelEventArgs e)
         {
-            _pObjs.Last().PObject.Charge += e.Delta * 1e-6f;
+            if (_pObjs.Count > 0)
+            {
+                _pObjs.Last().PObject.Charge += e.Delta * 1e-6f;
+            }
         }
 
         #endregion
@@ -119,30 +203,39 @@ namespace ElectroSim
 
         private int CompileShader(ShaderType type, string filepath)
         {
-            var shader = GL.CreateShader(type);
-            var source = File.ReadAllText(filepath);
+            int shader = GL.CreateShader(type);
+            string source = File.ReadAllText(filepath);
             GL.ShaderSource(shader, source);
             GL.CompileShader(shader);
-            var info = GL.GetShaderInfoLog(shader);
+            string info = GL.GetShaderInfoLog(shader);
             if (!string.IsNullOrWhiteSpace(info))
+            {
                 Console.WriteLine($"GL.CompileShader [{type}] had info log: {info}");
+            }
+
             return shader;
         }
 
         private int CreateProgram()
         {
-            var program = GL.CreateProgram();
-            var shaders = new List<int>();
+            int program = GL.CreateProgram();
+            List<int> shaders = new List<int>();
             shaders.Add(CompileShader(ShaderType.VertexShader, @"Shaders\vertex_shader.vert"));
             shaders.Add(CompileShader(ShaderType.FragmentShader, @"Shaders\fragment_shader.frag"));
 
-            foreach (var shader in shaders)
+            foreach (int shader in shaders)
+            {
                 GL.AttachShader(program, shader);
+            }
+
             GL.LinkProgram(program);
-            var info = GL.GetProgramInfoLog(program);
+            string info = GL.GetProgramInfoLog(program);
             if (!string.IsNullOrWhiteSpace(info))
+            {
                 Console.WriteLine($"GL.LinkProgram had info log: {info}");
-            foreach (var shader in shaders)
+            }
+
+            foreach (int shader in shaders)
             {
                 GL.DetachShader(program, shader);
                 GL.DeleteShader(shader);
@@ -173,22 +266,11 @@ namespace ElectroSim
                 x -Width / 2f,
                 -y + Height / 2f
                 );
+    }
 
-        protected override void OnClosed(EventArgs e)
-        {
-            foreach (var obj in _renderables)
-            {
-                obj.Dispose();
-            }
-            foreach (var obj in _pObjs)
-            {
-                obj.Dispose();
-            }
-            _renderables.Clear();
-            _pObjs.Clear();
-            _renderables = null;
-            _pObjs = null;
-            GC.Collect();
-        }
+    public static class MyExtension
+    {
+        public static System.Numerics.Vector2 SetLength(this System.Numerics.Vector2 vector, float length)
+            => vector / vector.Length() * length;
     }
 }

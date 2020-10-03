@@ -3,11 +3,8 @@
 using OpenTK;
 using OpenTK.Graphics;
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ElectroSim.VBOs
 {
@@ -55,10 +52,18 @@ namespace ElectroSim.VBOs
             _renderCollection.Dispose();
         }
 
-        public override void Render(ref Matrix4 projection, Vector3 translation, Vector3 rotation, Vector3 scale)
+        public override void Render(Vector3 translation, Vector3 rotation, Vector3 scale)
         {
-            _renderCollection.Position = new Vector3((float)PObject.X, (float)PObject.Y, 0);
-            _renderCollection.Render(ref projection, translation, rotation, scale);
+            _renderCollection.Position = new Vector3((float)PObject.X * MainWindow.Scale, (float)PObject.Y * MainWindow.Scale, 0);
+            _renderCollection.Render(translation, rotation, scale);
+        }
+    }
+
+    public static class PhysicalObjectExtractExtension
+    {
+        public static IEnumerable<PhysicalObject> Extracted(this IEnumerable<RPhysicalObject> objects)
+        {
+            return from obj in objects select obj.PObject;
         }
     }
 }

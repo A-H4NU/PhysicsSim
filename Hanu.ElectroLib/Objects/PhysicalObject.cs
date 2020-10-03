@@ -1,5 +1,4 @@
-﻿using MathNet.Numerics.LinearAlgebra;
-
+﻿
 using System.ComponentModel;
 using System.Numerics;
 

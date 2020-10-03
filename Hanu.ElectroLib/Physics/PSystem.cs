@@ -1,10 +1,6 @@
-﻿using Hanu.ElectroLib.Exceptions;
-using Hanu.ElectroLib.Objects;
-
-using MathNet.Numerics.LinearAlgebra;
+﻿using Hanu.ElectroLib.Objects;
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
