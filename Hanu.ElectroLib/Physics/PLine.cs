@@ -13,15 +13,35 @@ namespace Hanu.ElectroLib.Physics
 {
     public static class PLine
     {
+        /// <summary>
+        /// Calculate the electric field line asynchronously
+        /// </summary>
+        /// <param name="system">List of physical objects in the system</param>
+        /// <param name="initPos">Starting position of the electric field line</param>
+        /// <param name="endFunc">stop calculating the line if true</param>
+        /// <param name="startFromNegative">whether or not starting from negative charged object</param>
+        /// <param name="delta">small step of calculation, the smaller, the better</param>
+        /// <returns>the task that returns the list of points that represent the electric field line</returns>
         public async static Task<List<Vector2>> ElectricFieldLineAsync(IEnumerable<PhysicalObject> system, Vector2 initPos, Func<float, Vector2, bool> endFunc, bool startFromNegative, float delta = 1e-3f)
             => ElectricFieldLine(system, initPos, endFunc, startFromNegative, delta);
 
+        /// <summary>
+        /// Calculate the electric field line
+        /// </summary>
+        /// <param name="system">List of physical objects in the system</param>
+        /// <param name="initPos">Starting position of the electric field line</param>
+        /// <param name="endFunc">stop calculating the line if true</param>
+        /// <param name="startFromNegative">whether or not starting from negative charged object</param>
+        /// <param name="delta">small step of calculation, the smaller, the better</param>
+        /// <returns>the list of points that represent the electric field line</returns>
         public static List<Vector2> ElectricFieldLine(IEnumerable<PhysicalObject> system, Vector2 initPos, Func<float, Vector2, bool> endFunc, bool startFromNegative, float delta = 1e-3f)
         {
             Func<Vector2, Vector2> electric_field = PSystem.GetElectricFieldFunc(system);
             Vector2 f(float t, Vector2 v)
             {
+                // get electriv field at v
                 var e = electric_field(v);
+                // fix the length with 100
                 return e / e.Length() * 100f;
             }
             List<Vector2> vectorArrays = new List<Vector2>();
@@ -32,13 +52,17 @@ namespace Hanu.ElectroLib.Physics
                 Vector2 nums = f(num1, initPos);
                 Vector2 nums1 = f(num1, initPos + (nums * delta));
                 vectorArrays.Add(initPos + (delta * 0.5f * (nums + nums1)));
+                // if the line reached an charge very closely
                 if (TryFindMatch(
                     system,
                     (p) => p.Charge != 0 && DistFromPointToSegment(vectorArrays[vectorArrays.Count-2], vectorArrays.Last(), p.Position) < 0.1f,
                     out PhysicalObject obj))
                 {
+                    // remove the last element
                     vectorArrays.RemoveAt(vectorArrays.Count - 1);
+                    // add the position of the object that this line is approaching
                     vectorArrays.Add(obj.Position);
+                    // break this loop
                     break;
                 }
                 num1 += delta;
@@ -61,6 +85,10 @@ namespace Hanu.ElectroLib.Physics
             return false;
         }
 
+        /// <summary>
+        /// Get the minimum distance between P on the segment p1 p2 and the point
+        /// </summary>
+        /// <returns>minimum distance between P on the segment p1 p2 and the point</returns>
         private static float DistFromPointToSegment(Vector2 p1, Vector2 p2, Vector2 point)
         {
             Vector2 pp1 = point - p1, pp2 = point - p2, d = p2 - p1;
@@ -70,7 +98,6 @@ namespace Hanu.ElectroLib.Physics
             }
             d /= d.Length();
             return (pp1 - Vector2.Dot(pp1, d) * d).Length();
-            
         }
     }
 }
