@@ -254,7 +254,7 @@ namespace ElectroSim
                     }
                     // stop the stopwatch and write how much time is elapsed
                     stopwatch.Stop();
-                    Console.WriteLine($"Time elapsed: {stopwatch.ElapsedMilliseconds} ms; {_lines.Count} lines");
+                    Console.WriteLine($"Time elapsed: {stopwatch.Elapsed.TotalMilliseconds:F2} ms; {_lines.Count} lines");
                 }
             }
         }
