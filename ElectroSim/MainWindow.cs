@@ -39,9 +39,9 @@ namespace ElectroSim
         /// <summary>
         /// Maximum t value to render electric field lines
         /// </summary>
-        public static float MaxT = 100f;
+        public static float MaxT = 5f;
 
-        public static int LinePerUnitCharge = 50;
+        public static int LinePerUnitCharge = 32;
 
         public static float UnitCharge = 1e-6f;
 
@@ -92,6 +92,8 @@ namespace ElectroSim
             // Fill each face no matter it is a front face or not
             GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Fill);
             GL.PatchParameter(PatchParameterInt.PatchVertices, 3);
+
+            GL.LineWidth(2f);
             
         }
 
@@ -107,8 +109,11 @@ namespace ElectroSim
         /// <summary>
         /// Called before <see cref="OnRenderFrame(FrameEventArgs)"/>, to update variables by time and input
         /// </summary>
+
+        private double _t = 0.0;
         protected override void OnUpdateFrame(FrameEventArgs e)
         {
+            _t += e.Time;
             HandleKeyboard();
         }
 
@@ -195,7 +200,7 @@ namespace ElectroSim
                     WindowState = WindowState.Normal;
                 }
             }
-            if (e.Key == Key.F && !e.IsRepeat)
+            if (e.Key == Key.F && true || !e.IsRepeat)
             {
                 // If _pObjs contains any object whose charge is not zero
                 if (_pObjs.Any((p) => p.PObject.Charge != 0f))
@@ -264,10 +269,9 @@ namespace ElectroSim
         /// </summary>
         protected override void OnMouseDown(MouseButtonEventArgs e)
         {
-            System.Numerics.Vector2 pos = ScreenToCoord(e.X, e.Y);
+            System.Numerics.Vector2 pos = ScreenToCoord(e.X, e.Y) / Scale;
             if (e.Button == MouseButton.Left)
             {
-                pos /= Scale;
                 FixedObject obj = new FixedObject(pos);
                 _pObjs.Add(new RPhysicalObject(obj));
                 Console.WriteLine($"Added object at {pos}");
@@ -277,7 +281,7 @@ namespace ElectroSim
                 if (_pObjs.Count != 0)
                 {
                     var ef = PSystem.GetElectricFieldAt(_pObjs.Extracted(), pos);
-                    Console.WriteLine($"Electric field at {pos,15}: {ef.Length(),7:F2} N/C, {Math.Atan2(ef.Y, ef.X) * 180 / Math.PI,7:F2}°");
+                    Console.WriteLine($"Electric field at {pos,15}: {ef.Length(),9:F2} N/C, {Math.Atan2(ef.Y, ef.X) * 180 / Math.PI,7:F2}°");
                 }
             }
         }
