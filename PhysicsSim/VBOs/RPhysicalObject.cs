@@ -20,8 +20,11 @@ namespace PhysicsSim.VBOs
 
         private ROCollection _renderCollection;
 
-        public RPhysicalObject(PhysicalObject pObject)
+        private readonly int _program;
+
+        public RPhysicalObject(PhysicalObject pObject, int program)
         {
+            _program = program;
             PObject = pObject;
             Position = new Vector3(pObject.X, PObject.Y, 0);
             PObject.PropertyChanged += PObject_PropertyChanged;
@@ -42,11 +45,16 @@ namespace PhysicsSim.VBOs
             => new ROCollection(
                     new RenderObject[]
                     {
-                        new RenderObject(ObjectFactory.FilledCircle(
-                            radius: Radius,
-                            color: PObject.Charge == 0f ? Color4.Gray : (PObject.Charge > 0f ? Color4.Red : Color4.Blue))),
-                        new RenderObject(ObjectFactory.HollowCircle(
-                            radius: Radius, thickness: BorderThickness, color: Color4.White))
+                        new RenderObject(
+                                ObjectFactory.FilledCircle(
+                                    radius: Radius,
+                                    color: PObject.Charge == 0f ? Color4.Gray : (PObject.Charge > 0f ? Color4.Red : Color4.Blue)),
+                                _program),
+                        new RenderObject(
+                                ObjectFactory.HollowCircle(
+                                    radius: Radius, thickness: BorderThickness,
+                                    color: Color4.White),
+                                _program)
                     });
 
         public override void Dispose()
@@ -54,10 +62,10 @@ namespace PhysicsSim.VBOs
             _renderCollection.Dispose();
         }
 
-        public override void Render(Vector3 translation, Vector3 rotation, Vector3 scale)
+        public override void Render(ref Matrix4 projection, Vector3 translation, Vector3 rotation, Vector3 scale)
         {
             _renderCollection.Position = new Vector3((float)PObject.X * ElectroScene.Scale, (float)PObject.Y * ElectroScene.Scale, 0);
-            _renderCollection.Render(translation, rotation, scale);
+            _renderCollection.Render(ref projection, translation, rotation, scale);
         }
     }
 

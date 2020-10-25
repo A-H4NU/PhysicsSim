@@ -28,11 +28,12 @@ namespace PhysicsSim.VBOs
             _rObj = null;
         }
 
-        public override void Render(Vector3 translation, Vector3 rotation, Vector3 scale)
+        public override void Render(ref Matrix4 projection, Vector3 translation, Vector3 rotation, Vector3 scale)
         {
             foreach (ARenderable ro in _rObj)
             {
                 ro.Render(
+                    ref projection,
                     translation + Position,
                     rotation + Rotation,
                     scale * Scale);

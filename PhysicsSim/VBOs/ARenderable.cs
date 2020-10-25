@@ -1,4 +1,5 @@
 ﻿using OpenTK;
+using OpenTK.Graphics.OpenGL4;
 
 using System;
 
@@ -15,7 +16,7 @@ namespace PhysicsSim.VBOs
         /// <summary>
         /// Render with no additional transition, rotation, or scaling
         /// </summary>
-        public virtual void Render() => Render(Vector3.Zero, Vector3.Zero, Vector3.One);
+        public virtual void Render(ref Matrix4 projection) => Render(ref projection, Vector3.Zero, Vector3.Zero, Vector3.One);
 
         /// <summary>
         /// Render with additional transition, rotation, or scaling
@@ -23,7 +24,7 @@ namespace PhysicsSim.VBOs
         /// <param name="translation">additional transition</param>
         /// <param name="rotation">additional rotation</param>
         /// <param name="scale">additional scaling</param>
-        public abstract void Render(Vector3 translation, Vector3 rotation, Vector3 scale);
+        public abstract void Render(ref Matrix4 projection, Vector3 translation, Vector3 rotation, Vector3 scale);
 
         /// <summary>
         /// Return new modelview matrix with no additional transition, rotation, or scaling

@@ -13,6 +13,8 @@ using Hanu.ElectroLib.Physics;
 using Hanu.ElectroLib.Objects;
 using System.Diagnostics;
 using OpenTK.Graphics;
+using System.Runtime.InteropServices;
+using System.Security.Permissions;
 
 namespace PhysicsSim.Scenes
 {
@@ -80,19 +82,18 @@ namespace PhysicsSim.Scenes
             GL.Clear(ClearBufferMask.ColorBufferBit);
 
             // Declare that we will use this program
-            GL.UseProgram(_window.Program);
+            GL.UseProgram(_window.ColoredProgram);
             // Get projection matrix and make shaders to compute with this matrix
             Matrix4 projection = GetProjection();
-            GL.UniformMatrix4(MainWindow.ProjectionLocation, false, ref projection);
 
             // Render all objects, overlaying other objects rendered before
             foreach (ARenderable render in _lines)
             {
-                render.Render();
+                render.Render(ref projection);
             }
             foreach (RPhysicalObject obj in _pObjs)
             {
-                obj.Render();
+                obj.Render(ref projection);
             }
 
             // Swap buffers (currently painting buffer and the buffer that is displayed now)
@@ -110,7 +111,7 @@ namespace PhysicsSim.Scenes
             if (e.Button == MouseButton.Left)
             {
                 FixedObject obj = new FixedObject(pos);
-                _pObjs.Add(new RPhysicalObject(obj));
+                _pObjs.Add(new RPhysicalObject(obj, _window.ColoredProgram));
                 Console.WriteLine($"Added object at {pos}");
             }
             if (e.Button == MouseButton.Right)
@@ -199,7 +200,7 @@ namespace PhysicsSim.Scenes
                         // get the result from the finished task
                         var result = await finished;
                         // add the line to _lines list
-                        _lines.Add(new RenderObject(ObjectFactory.Curve(result, Color4.White)) { Scale = new Vector3(Scale, Scale, 1) });
+                        _lines.Add(new RenderObject(ObjectFactory.Curve(result, Color4.White), _window.ColoredProgram) { Scale = new Vector3(Scale, Scale, 1) });
                     }
                     // stop the stopwatch and write how much time is elapsed
                     stopwatch.Stop();

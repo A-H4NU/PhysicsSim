@@ -10,16 +10,18 @@ namespace PhysicsSim.VBOs
     public class RenderObject : ARenderable
     {
         private bool _initialized;
-        private readonly int _vertexArray;
-        private readonly int _buffer;
         private readonly int _verticeCount;
+        private readonly int _program;
+
+        private readonly int _vertexArray, _buffer;
         private readonly PrimitiveType _renderType;
 
-        public RenderObject((ColoredVertex[] vertices, PrimitiveType renderType) tuple)
+        public RenderObject((ColoredVertex[] vertices, PrimitiveType renderType) tuple, int program)
         {
             ColoredVertex[] vertices = tuple.vertices;
             _renderType = tuple.renderType;
             _verticeCount = vertices.Length;
+            _program = program;
 
             _vertexArray = GL.GenVertexArray();
             _buffer = GL.GenBuffer();
@@ -58,10 +60,12 @@ namespace PhysicsSim.VBOs
             _initialized = true;
         }
 
-        public override void Render(Vector3 translation, Vector3 rotation, Vector3 scale)
+        public override void Render(ref Matrix4 projection, Vector3 translation, Vector3 rotation, Vector3 scale)
         {
+            GL.UseProgram(_program);
             Matrix4 modelview = GetModelView(translation, rotation, scale);
             GL.UniformMatrix4(MainWindow.ModelviewLocation, false, ref modelview);
+            GL.UniformMatrix4(MainWindow.ProjectionLocation, false, ref projection);
             GL.BindVertexArray(_vertexArray);
             GL.BindBuffer(BufferTarget.ArrayBuffer, _buffer);
             GL.DrawArrays(_renderType, 0, _verticeCount);

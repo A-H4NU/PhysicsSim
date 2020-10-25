@@ -22,11 +22,17 @@ namespace PhysicsSim
 {
     public sealed class MainWindow : GameWindow
     {
-        public static int ModelviewLocation = 10;
+        public static readonly int ModelviewLocation = 10;
 
-        public static int ProjectionLocation = 11;
+        public static readonly int ProjectionLocation = 11;
 
-        public int Program { get; private set; }
+        public static readonly string ColoredVertexShaderPath = @"Shaders\colored_vertex_shader.vert";
+        public static readonly string ColoredFragmentShaderPath = @"Shaders\colored_fragment_shader.frag";
+        public static readonly string TexturedVertexShaderPath = @"Shaders\textured_vertex_shader.vert";
+        public static readonly string TexturedFragmentShaderPath = @"Shaders\textured_fragment_shader.frag";
+
+        public int ColoredProgram { get; private set; }
+        public int TexturedProgram { get; private set; }
 
         private readonly Timer _timer;
 
@@ -37,11 +43,13 @@ namespace PhysicsSim
         {
             // Create timer that perform a specific function
             _timer = new Timer(5000);
-            _timer.Elapsed += (o, e) => Console.WriteLine($"total memory using at {e.SignalTime:HH:mm:ss:fff}: {GC.GetTotalMemory(true)} bytes");
+            _timer.Elapsed += (o, e) =>
+            {
+                Console.WriteLine($"total memory using at {e.SignalTime:HH:mm:ss:fff}: {GC.GetTotalMemory(true)} bytes");
+            };
             _timer.Start();
 
-            _es = new ElectroScene(this);
-            _es.Enabled = true;
+            _es = new ElectroScene(this) { Enabled = true };
         }
 
         // Contains overrided methods from OpenTK to render
@@ -56,11 +64,14 @@ namespace PhysicsSim
             GL.ClearColor(new Color4(0.1f, 0.1f, 0.4f, 1.0f));
 
             // Create a new program that is used when rendering
-            Program = CreateProgram();
+            ColoredProgram = CreateProgram(ColoredVertexShaderPath, ColoredFragmentShaderPath);
+            TexturedProgram = CreateProgram(TexturedVertexShaderPath, TexturedFragmentShaderPath);
 
             // Fill each face no matter it is a front face or not
             GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Fill);
             GL.PatchParameter(PatchParameterInt.PatchVertices, 3);
+
+            //GL.Enable(EnableCap.Texture2D);
 
             GL.LineWidth(2f);
         }
@@ -81,6 +92,11 @@ namespace PhysicsSim
         {
             Time += e.Time;
             HandleKeyboard();
+        }
+
+        protected override void OnRenderFrame(FrameEventArgs e)
+        {
+            base.OnRenderFrame(e);
         }
 
         /// <summary>
@@ -125,7 +141,7 @@ namespace PhysicsSim
             GL.ShaderSource(shader, source);
             GL.CompileShader(shader);
             string info = GL.GetShaderInfoLog(shader);
-            if (!string.IsNullOrWhiteSpace(info))
+            if (!String.IsNullOrWhiteSpace(info))
             {
                 Console.WriteLine($"GL.CompileShader [{type}] had info log: {info}");
             }
@@ -137,12 +153,14 @@ namespace PhysicsSim
         /// Create a new program that contains <see cref="ShaderType.VertexShader"/> and <see cref="ShaderType.FragmentShader"/>
         /// </summary>
         /// <returns>The ID of the created program</returns>
-        private int CreateProgram()
+        private int CreateProgram(string vertexPath, string fragmentPath)
         {
             int program = GL.CreateProgram();
-            List<int> shaders = new List<int>();
-            shaders.Add(CompileShader(ShaderType.VertexShader, @"Shaders\vertex_shader.vert"));
-            shaders.Add(CompileShader(ShaderType.FragmentShader, @"Shaders\fragment_shader.frag"));
+            List<int> shaders = new List<int>
+            {
+                CompileShader(ShaderType.VertexShader, vertexPath),
+                CompileShader(ShaderType.FragmentShader, fragmentPath)
+            };
 
             foreach (int shader in shaders)
             {
@@ -151,7 +169,7 @@ namespace PhysicsSim
 
             GL.LinkProgram(program);
             string info = GL.GetProgramInfoLog(program);
-            if (!string.IsNullOrWhiteSpace(info))
+            if (!String.IsNullOrWhiteSpace(info))
             {
                 Console.WriteLine($"GL.LinkProgram had info log: {info}");
             }
