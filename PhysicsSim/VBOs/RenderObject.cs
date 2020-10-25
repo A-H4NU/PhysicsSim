@@ -1,11 +1,11 @@
-﻿using ElectroSim.Vertices;
+﻿using PhysicsSim.Vertices;
 
 using OpenTK;
 using OpenTK.Graphics.OpenGL4;
 
 using System;
 
-namespace ElectroSim.VBOs
+namespace PhysicsSim.VBOs
 {
     public class RenderObject : ARenderable
     {

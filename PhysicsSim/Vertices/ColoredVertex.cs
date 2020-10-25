@@ -1,7 +1,7 @@
 ﻿using OpenTK;
 using OpenTK.Graphics;
 
-namespace ElectroSim.Vertices
+namespace PhysicsSim.Vertices
 {
     public struct ColoredVertex
     {

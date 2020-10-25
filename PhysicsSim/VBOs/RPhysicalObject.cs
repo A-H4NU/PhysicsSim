@@ -1,4 +1,4 @@
-﻿using ElectroSim.Scenes;
+﻿using PhysicsSim.Scenes;
 
 using Hanu.ElectroLib.Objects;
 
@@ -8,7 +8,7 @@ using OpenTK.Graphics;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace ElectroSim.VBOs
+namespace PhysicsSim.VBOs
 {
     public class RPhysicalObject : ARenderable
     {

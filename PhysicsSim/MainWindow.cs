@@ -1,6 +1,6 @@
-﻿using ElectroSim.Scenes;
-using ElectroSim.VBOs;
-using ElectroSim.Vertices;
+﻿using PhysicsSim.Scenes;
+using PhysicsSim.VBOs;
+using PhysicsSim.Vertices;
 
 using Hanu.ElectroLib.Objects;
 using Hanu.ElectroLib.Physics;
@@ -18,7 +18,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Timers;
 
-namespace ElectroSim
+namespace PhysicsSim
 {
     public sealed class MainWindow : GameWindow
     {
@@ -33,7 +33,7 @@ namespace ElectroSim
         private ElectroScene _es;
 
         public MainWindow(int width, int height)
-            : base(width, height, new GraphicsMode(32, 24, 0, 8), "ElectroSim", GameWindowFlags.Default, DisplayDevice.Default)
+            : base(width, height, new GraphicsMode(32, 24, 0, 8), "PhysicsSim", GameWindowFlags.Default, DisplayDevice.Default)
         {
             // Create timer that perform a specific function
             _timer = new Timer(5000);

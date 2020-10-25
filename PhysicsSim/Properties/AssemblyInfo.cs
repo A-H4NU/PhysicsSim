@@ -4,11 +4,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("ElectroSim")]
+[assembly: AssemblyTitle("PhysicsSim")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Han Seungwoo and Jeon Jaewon")]
-[assembly: AssemblyProduct("ElectroSim")]
+[assembly: AssemblyProduct("PhysicsSim")]
 [assembly: AssemblyCopyright("Copyright © Han Seungwoo and Jeon Jaewon 2020")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

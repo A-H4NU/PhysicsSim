@@ -2,7 +2,7 @@
 
 using System.Collections.Generic;
 
-namespace ElectroSim.VBOs
+namespace PhysicsSim.VBOs
 {
     public class ROCollection : ARenderable
     {

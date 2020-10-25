@@ -1,4 +1,4 @@
-﻿using ElectroSim.Vertices;
+﻿using PhysicsSim.Vertices;
 
 using OpenTK;
 using OpenTK.Graphics;
@@ -7,7 +7,7 @@ using OpenTK.Graphics.OpenGL4;
 using System;
 using System.Collections.Generic;
 
-namespace ElectroSim
+namespace PhysicsSim
 {
     public static class ObjectFactory
     {

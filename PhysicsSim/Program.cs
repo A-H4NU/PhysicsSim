@@ -1,4 +1,4 @@
-﻿namespace ElectroSim
+﻿namespace PhysicsSim
 {
     internal class Program
     {

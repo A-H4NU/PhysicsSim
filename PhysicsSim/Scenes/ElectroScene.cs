@@ -1,4 +1,4 @@
-﻿using ElectroSim.VBOs;
+﻿using PhysicsSim.VBOs;
 
 using OpenTK;
 using OpenTK.Input;
@@ -14,7 +14,7 @@ using Hanu.ElectroLib.Objects;
 using System.Diagnostics;
 using OpenTK.Graphics;
 
-namespace ElectroSim.Scenes
+namespace PhysicsSim.Scenes
 {
     public sealed class ElectroScene : Scene
     {

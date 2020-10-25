@@ -2,7 +2,7 @@
 
 using System;
 
-namespace ElectroSim.VBOs
+namespace PhysicsSim.VBOs
 {
     public abstract class ARenderable : IDisposable
     {
