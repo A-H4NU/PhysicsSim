@@ -30,7 +30,7 @@ namespace ElectroSim
 
         public enum BorderType
         {
-            Inner, Middle, Outter
+            Inner, Middle , Outter
         }
 
         public static (ColoredVertex[], PrimitiveType) HollowCircle(
@@ -41,20 +41,20 @@ namespace ElectroSim
             int precision = 30)
         {
             float outrad = 0f, inrad = 0f;
-            if (borderType == BorderType.Inner)
+            switch (borderType)
             {
-                outrad = radius;
-                inrad = radius - thickness;
-            }
-            else if (borderType == BorderType.Middle)
-            {
-                outrad = radius + thickness / 2;
-                inrad = radius - thickness / 2;
-            }
-            else if (borderType == BorderType.Outter)
-            {
-                outrad = radius + thickness;
-                inrad = radius;
+                case BorderType.Inner:
+                    outrad = radius;
+                    inrad = radius - thickness;
+                    break;
+                case BorderType.Middle:
+                    outrad = radius + thickness / 2;
+                    inrad = radius - thickness / 2;
+                    break;
+                case BorderType.Outter:
+                    outrad = radius + thickness;
+                    inrad = radius;
+                    break;
             }
             ColoredVertex[] result = new ColoredVertex[2 * precision + 2];
             for (int i = 0; i <= precision; ++i)

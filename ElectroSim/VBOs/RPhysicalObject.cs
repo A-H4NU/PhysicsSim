@@ -1,4 +1,6 @@
-﻿using Hanu.ElectroLib.Objects;
+﻿using ElectroSim.Scenes;
+
+using Hanu.ElectroLib.Objects;
 
 using OpenTK;
 using OpenTK.Graphics;
@@ -54,7 +56,7 @@ namespace ElectroSim.VBOs
 
         public override void Render(Vector3 translation, Vector3 rotation, Vector3 scale)
         {
-            _renderCollection.Position = new Vector3((float)PObject.X * MainWindow.Scale, (float)PObject.Y * MainWindow.Scale, 0);
+            _renderCollection.Position = new Vector3((float)PObject.X * ElectroScene.Scale, (float)PObject.Y * ElectroScene.Scale, 0);
             _renderCollection.Render(translation, rotation, scale);
         }
     }
