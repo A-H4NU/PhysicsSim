@@ -1,2 +1,2 @@
-# ElectroSim
-Electrics Simulation
+# PhysicsSim
+Varius Physics Simulations

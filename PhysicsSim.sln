@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30517.126
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hanu.ElectroLib", "Hanu.ElectroLib\Hanu.ElectroLib.csproj", "{3CAA37E3-626B-4A5A-9F29-9899EC54222A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhysicsSim", "PhysicsSim\PhysicsSim.csproj", "{E9F74E8B-FA08-4F0B-9E7B-483B3CFBAAB3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ElectroSim", "ElectroSim\ElectroSim.csproj", "{C7EFA623-A3EF-4737-87E3-194DC499902E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hanu.ElectroLib", "Hanu.ElectroLib\Hanu.ElectroLib.csproj", "{3CAA37E3-626B-4A5A-9F29-9899EC54222A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,10 +17,10 @@ Global
 		{3CAA37E3-626B-4A5A-9F29-9899EC54222A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3CAA37E3-626B-4A5A-9F29-9899EC54222A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3CAA37E3-626B-4A5A-9F29-9899EC54222A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C7EFA623-A3EF-4737-87E3-194DC499902E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C7EFA623-A3EF-4737-87E3-194DC499902E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C7EFA623-A3EF-4737-87E3-194DC499902E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C7EFA623-A3EF-4737-87E3-194DC499902E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E9F74E8B-FA08-4F0B-9E7B-483B3CFBAAB3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E9F74E8B-FA08-4F0B-9E7B-483B3CFBAAB3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E9F74E8B-FA08-4F0B-9E7B-483B3CFBAAB3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E9F74E8B-FA08-4F0B-9E7B-483B3CFBAAB3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

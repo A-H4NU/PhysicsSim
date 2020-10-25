@@ -4,10 +4,10 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{C7EFA623-A3EF-4737-87E3-194DC499902E}</ProjectGuid>
+    <ProjectGuid>{E9F74E8B-FA08-4F0B-9E7B-483B3CFBAAB3}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <RootNamespace>ElectroSim</RootNamespace>
-    <AssemblyName>ElectroSim</AssemblyName>
+    <RootNamespace>PhysicsSim</RootNamespace>
+    <AssemblyName>PhysicsSim</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
