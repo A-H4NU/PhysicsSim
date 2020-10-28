@@ -38,6 +38,8 @@ namespace PhysicsSim
 
         private ElectroScene _es;
 
+        private TexturedRenderObject _tro;
+
         public MainWindow(int width, int height)
             : base(width, height, new GraphicsMode(32, 24, 0, 8), "PhysicsSim", GameWindowFlags.Default, DisplayDevice.Default)
         {
@@ -67,11 +69,16 @@ namespace PhysicsSim
             ColoredProgram = CreateProgram(ColoredVertexShaderPath, ColoredFragmentShaderPath);
             TexturedProgram = CreateProgram(TexturedVertexShaderPath, TexturedFragmentShaderPath);
 
+            _tro = new TexturedRenderObject(ObjectFactory.TexRectangle(900f, 900f), @"Textures\unnamed3.jpeg", TexturedProgram);
+
             // Fill each face no matter it is a front face or not
             GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Fill);
             GL.PatchParameter(PatchParameterInt.PatchVertices, 3);
 
-            //GL.Enable(EnableCap.Texture2D);
+            GL.Enable(EnableCap.Blend);
+            GL.Enable(EnableCap.LineSmooth);
+
+            GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
 
             GL.LineWidth(2f);
         }
@@ -83,6 +90,8 @@ namespace PhysicsSim
         {
             // change the viewport (where rendered images are represented)
             GL.Viewport(ClientRectangle);
+
+            base.OnResize(e);
         }
 
         
@@ -97,6 +106,14 @@ namespace PhysicsSim
         protected override void OnRenderFrame(FrameEventArgs e)
         {
             base.OnRenderFrame(e);
+
+            //GL.Clear(ClearBufferMask.ColorBufferBit);
+
+            //Matrix4 projection = Matrix4.CreateOrthographic(Width, Height, -1f, 1f);
+
+            //_tro.Render(ref projection);
+
+            //SwapBuffers();
         }
 
         /// <summary>

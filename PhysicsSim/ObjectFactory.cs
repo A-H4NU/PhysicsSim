@@ -108,12 +108,12 @@ namespace PhysicsSim
             width /= 2f; height /= 2f;
             TexturedVertex[] res = new TexturedVertex[]
             {
-                new TexturedVertex(new Vector4(+width, +height, 0f, 1f), new Vector2(1f, 1f)),
-                new TexturedVertex(new Vector4(-width, +height, 0f, 1f), new Vector2(0f, 1f)),
-                new TexturedVertex(new Vector4(+width, -height, 0f, 1f), new Vector2(1f, 0f)),
-                new TexturedVertex(new Vector4(-width, +height, 0f, 1f), new Vector2(0f, 1f)),
-                new TexturedVertex(new Vector4(+width, -height, 0f, 1f), new Vector2(1f, 0f)),
-                new TexturedVertex(new Vector4(-width, -height, 0f, 1f), new Vector2(0f, 0f))
+                new TexturedVertex(new Vector4(+width, +height, 0f, 1f), new Vector2(1f, 0f)),
+                new TexturedVertex(new Vector4(-width, +height, 0f, 1f), new Vector2(0f, 0f)),
+                new TexturedVertex(new Vector4(+width, -height, 0f, 1f), new Vector2(1f, 1f)),
+                new TexturedVertex(new Vector4(-width, +height, 0f, 1f), new Vector2(0f, 0f)),
+                new TexturedVertex(new Vector4(+width, -height, 0f, 1f), new Vector2(1f, 1f)),
+                new TexturedVertex(new Vector4(-width, -height, 0f, 1f), new Vector2(0f, 1f))
             };
             return (res, PrimitiveType.Triangles);
         }

@@ -5,6 +5,7 @@ using PhysicsSim.Vertices;
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Linq;
@@ -32,6 +33,9 @@ namespace PhysicsSim.VBOs
 
             _vertexArray = GL.GenVertexArray();
             _buffer = GL.GenBuffer();
+
+            GL.BindVertexArray(_vertexArray);
+            GL.BindBuffer(BufferTarget.ArrayBuffer, _buffer);
 
             GL.NamedBufferStorage(
                 _buffer,
@@ -67,80 +71,38 @@ namespace PhysicsSim.VBOs
         public override void Render(ref Matrix4 projection, Vector3 translation, Vector3 rotation, Vector3 scale)
         {
             GL.UseProgram(_program);
-            Matrix4 modelview = GetModelView(translation, rotation, scale);
-            GL.UniformMatrix4(MainWindow.ModelviewLocation, false, ref modelview);
-            GL.UniformMatrix4(MainWindow.ProjectionLocation, false, ref projection);
             GL.BindVertexArray(_vertexArray);
             GL.BindBuffer(BufferTarget.ArrayBuffer, _buffer);
             GL.BindTexture(TextureTarget.Texture2D, _texture);
+            Matrix4 modelview = GetModelView(translation, rotation, scale);
+            GL.UniformMatrix4(MainWindow.ModelviewLocation, false, ref modelview);
+            GL.UniformMatrix4(MainWindow.ProjectionLocation, false, ref projection);
             GL.DrawArrays(_renderType, 0, _verticeCount);
         }
 
         private int InitTexture(string filename)
         {
-            var data = LoadTexture(filename, out int width, out int height);
-            int texture = GL.GenTexture();
-            GL.TextureStorage2D(
-                texture:        texture,
-                levels:         1,
-                internalformat: SizedInternalFormat.Rgba16f,
-                width:          width,
-                height:         height);
-
+            GL.CreateTextures(TextureTarget.Texture2D, 1, out int texture);
+            var bitmap = (Bitmap)Image.FromFile(filename);
+            var data = bitmap.LockBits(
+               new Rectangle(0, 0, bitmap.Width, bitmap.Height),
+               ImageLockMode.ReadOnly,
+               System.Drawing.Imaging.PixelFormat.Format32bppArgb);
             GL.BindTexture(TextureTarget.Texture2D, texture);
-            GL.TextureSubImage2D(
-                texture:        texture,
-                level:          0,
-                xoffset:        0,
-                yoffset:        0,
-                width:          width,
-                height:         height,
-                format:         OpenTK.Graphics.OpenGL4.PixelFormat.Rgba,
-                type:           PixelType.Float,
-                pixels:         data);
+            GL.TexImage2D(
+                TextureTarget.Texture2D,
+                0,
+                PixelInternalFormat.Rgba,
+                data.Width,
+                data.Height,
+                0,
+                OpenTK.Graphics.OpenGL4.PixelFormat.Bgra,
+                PixelType.UnsignedByte,
+                data.Scan0);
+            bitmap.UnlockBits(data);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Nearest);
             return texture;
-        }
-
-        private float[] LoadTexture(string filename, out int width, out int height)
-        {
-            float[] res;
-            using (Bitmap bmp = (Bitmap)Image.FromFile(filename))
-            {
-                width = bmp.Width;
-                height = bmp.Height;
-                res = new float[width * height * 4];
-                BitmapData data = null;
-                try
-                {
-                    data = bmp.LockBits(
-                        new Rectangle(0, 0, bmp.Width, bmp.Height),
-                        ImageLockMode.ReadOnly,
-                        System.Drawing.Imaging.PixelFormat.Format24bppRgb);
-                    unsafe
-                    {
-                        int index = 0;
-                        var ptr = (byte*)data.Scan0;
-                        int remain = data.Stride - data.Width * 3;
-                        for (int i = 0; i < data.Height; ++i)
-                        {
-                            for (int j = 0; j < data.Width; ++j)
-                            {
-                                res[index++] = ptr[2] / 255f;
-                                res[index++] = ptr[1] / 255f;
-                                res[index++] = ptr[1] / 255f;
-                                res[index++] = 1f;
-                                ptr += 3;
-                            }
-                            ptr += remain;
-                        }
-                    }
-                }
-                finally
-                {
-                    bmp.UnlockBits(data);
-                }
-            }
-            return res;
         }
 
         protected virtual void Dispose(bool disposing)

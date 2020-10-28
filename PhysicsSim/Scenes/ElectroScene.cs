@@ -52,19 +52,8 @@ namespace PhysicsSim.Scenes
 
         protected override void OnClosed(object sender, EventArgs e)
         {
-            // Clear all disposable objects
-            foreach (ARenderable obj in _lines)
-            {
-                obj.Dispose();
-            }
-            foreach (RPhysicalObject obj in _pObjs)
-            {
-                obj.Dispose();
-            }
-            _lines.Clear();
-            _pObjs.Clear();
-            _lines = null;
-            _pObjs = null;
+            Dispose();
+            GC.SuppressFinalize(this);
         }
 
         /// <summary>
@@ -100,13 +89,14 @@ namespace PhysicsSim.Scenes
             _window.SwapBuffers();
         }
 
-
         #endregion
 
         #region Input Handling
 
         protected override void OnMouseDown(object sender, MouseButtonEventArgs e)
         {
+            if (!Enabled) return;
+
             System.Numerics.Vector2 pos = ScreenToCoord(e.X, e.Y) / Scale;
             if (e.Button == MouseButton.Left)
             {
@@ -126,6 +116,8 @@ namespace PhysicsSim.Scenes
 
         protected override void OnMouseWheel(object sender, MouseWheelEventArgs e)
         {
+            if (!Enabled) return;
+
             if (_pObjs.Count > 0)
             {
                 _pObjs.Last().PObject.Charge += e.Delta * UnitCharge;
@@ -134,6 +126,8 @@ namespace PhysicsSim.Scenes
 
         protected override async void OnKeyDown(object sender, KeyboardKeyEventArgs e)
         {
+            if (!Enabled) return;
+
             if (e.Key == Key.F11)
             {
                 if (_window.WindowState != WindowState.Fullscreen)
@@ -213,6 +207,19 @@ namespace PhysicsSim.Scenes
 
         public override void Dispose()
         {
+            // Clear all disposable objects
+            foreach (ARenderable obj in _lines)
+            {
+                obj.Dispose();
+            }
+            foreach (RPhysicalObject obj in _pObjs)
+            {
+                obj.Dispose();
+            }
+            _lines.Clear();
+            _pObjs.Clear();
+            _lines = null;
+            _pObjs = null;
         }
 
         /// <summary>
