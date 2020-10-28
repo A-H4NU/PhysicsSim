@@ -6,6 +6,7 @@ using OpenTK.Graphics.OpenGL4;
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace PhysicsSim
 {
@@ -90,15 +91,21 @@ namespace PhysicsSim
         }
 
         public static (ColoredVertex[], PrimitiveType) Curve(
-            List<System.Numerics.Vector2> curve,
+            IEnumerable<System.Numerics.Vector2> curve,
             Color4 color)
         {
-            ColoredVertex[] result = new ColoredVertex[curve.Count];
+            var array = curve.ToArray();
+            ColoredVertex[] result = new ColoredVertex[array.Length];
             for (int i = 0; i < result.Length; ++i)
             {
-                result[i] = new ColoredVertex(new Vector4(curve[i].X, curve[i].Y, 0, 1), color);
+                result[i] = new ColoredVertex(new Vector4(array[i].X, array[i].Y, 0, 1), color);
             }
             return (result, PrimitiveType.LineStrip);
+        }
+
+        public static (ColoredVertex[], PrimitiveType) Curve(Color4 color, params System.Numerics.Vector2[] points)
+        {
+            return Curve(points, color);
         }
 
         public static (TexturedVertex[], PrimitiveType) TexRectangle(
