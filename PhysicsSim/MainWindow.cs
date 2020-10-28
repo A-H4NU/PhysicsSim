@@ -30,7 +30,7 @@ namespace PhysicsSim
 
         private readonly Timer _timer;
 
-        private ElectroScene _es;
+        private TestScene _es;
 
         public MainWindow(int width, int height)
             : base(width, height, new GraphicsMode(32, 24, 0, 8), "PhysicsSim", GameWindowFlags.Default, DisplayDevice.Default)
@@ -40,7 +40,7 @@ namespace PhysicsSim
             _timer.Elapsed += (o, e) => Console.WriteLine($"total memory using at {e.SignalTime:HH:mm:ss:fff}: {GC.GetTotalMemory(true)} bytes");
             _timer.Start();
 
-            _es = new ElectroScene(this);
+            _es = new TestScene(this);
             _es.Enabled = true;
         }
 
