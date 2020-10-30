@@ -41,17 +41,17 @@ namespace PhysicsSim.Scenes
         /// <summary>
         /// Called when the window is resized
         /// </summary>
-        protected virtual void OnResize(object sender, EventArgs e)
-        {
-        }
+        protected virtual void OnResize(object sender, EventArgs e) { }
 
         /// <summary>
         /// Called before <see cref="OnRenderFrame(FrameEventArgs)"/>, to update variables by time and input
+        /// <para>Do work only when <see cref="Enabled"/> == <see cref="true"/></para>
         /// </summary>
         protected abstract void OnUpdateFrame(object sender, FrameEventArgs e);
 
         /// <summary>
         /// Called to do render works
+        /// <para>Do work only when <see cref="Enabled"/> == <see cref="true"/></para>
         /// </summary>
         protected abstract void OnRenderFrame(object sender, FrameEventArgs e);
 
@@ -60,12 +60,22 @@ namespace PhysicsSim.Scenes
         /// </summary>
         protected abstract void OnClosed(object sender, EventArgs e);
 
+        /// <summary>
+        /// Called when a click is detedted
+        /// <para>Do work only when <see cref="Enabled"/> == <see cref="true"/></para>
+        /// </summary>
         protected virtual void OnMouseDown(object sender, MouseButtonEventArgs e) { }
 
+        /// <summary>
+        /// Called when a mouse wheel movement is detedted
+        /// <para>Do work only when <see cref="Enabled"/> == <see cref="true"/></para>
+        /// </summary>
         protected virtual void OnMouseWheel(object sender, MouseWheelEventArgs e) { }
 
-
-
+        /// <summary>
+        /// Called when a keyboard input is detedted
+        /// <para>Do work only when <see cref="Enabled"/> == <see cref="true"/></para>
+        /// </summary>
         protected virtual void OnKeyDown(object sender, KeyboardKeyEventArgs e) { }
 
         public abstract void Dispose();

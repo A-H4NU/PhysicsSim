@@ -52,12 +52,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Interactions\RectangularButton.cs" />
     <Compile Include="MainWindow.cs" />
     <Compile Include="ObjectFactory.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Scenes\ElectroScene.cs" />
     <Compile Include="Scenes\Scene.cs" />
+    <Compile Include="Scenes\SWScene.cs" />
+    <Compile Include="Interactions\AButton.cs" />
     <Compile Include="VBOs\ARenderable.cs" />
     <Compile Include="VBOs\RenderObject.cs" />
     <Compile Include="VBOs\ROCollection.cs" />

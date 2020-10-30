@@ -73,7 +73,7 @@ namespace PhysicsSim.Scenes
             // Declare that we will use this program
             GL.UseProgram(_window.ColoredProgram);
             // Get projection matrix and make shaders to compute with this matrix
-            Matrix4 projection = GetProjection();
+            Matrix4 projection = MainWindow.GetProjection(_window.Width, _window.Height);
 
             // Render all objects, overlaying other objects rendered before
             foreach (ARenderable render in _lines)
@@ -97,7 +97,7 @@ namespace PhysicsSim.Scenes
         {
             if (!Enabled) return;
 
-            System.Numerics.Vector2 pos = ScreenToCoord(e.X, e.Y) / Scale;
+            System.Numerics.Vector2 pos = MainWindow.ScreenToCoord(e.X, e.Y, _window.Width, _window.Height) / Scale;
             if (e.Button == MouseButton.Left)
             {
                 FixedObject obj = new FixedObject(pos);
@@ -221,24 +221,5 @@ namespace PhysicsSim.Scenes
             _lines = null;
             _pObjs = null;
         }
-
-        /// <summary>
-        /// Get projection matrix for rendering, which is a orthographic projection matrix
-        /// </summary>
-        /// <returns>The orthographic matrix</returns>
-        private Matrix4 GetProjection()
-        {
-            return Matrix4.CreateOrthographic(_window.Width, _window.Height, -1f, 1f);
-        }
-
-        /// <summary>
-        /// Convert input coordinate to system coordinate
-        /// </summary>
-        /// <returns>System coordinate</returns>
-        private System.Numerics.Vector2 ScreenToCoord(int x, int y)
-            => new System.Numerics.Vector2(
-                x - _window.Width / 2f,
-                -y + _window.Height / 2f
-                );
     }
 }

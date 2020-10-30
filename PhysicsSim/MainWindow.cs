@@ -36,7 +36,7 @@ namespace PhysicsSim
 
         private readonly Timer _timer;
 
-        private ElectroScene _es;
+        private SWScene _es;
 
         private TexturedRenderObject _tro;
 
@@ -45,13 +45,10 @@ namespace PhysicsSim
         {
             // Create timer that perform a specific function
             _timer = new Timer(5000);
-            _timer.Elapsed += (o, e) =>
-            {
-                Console.WriteLine($"total memory using at {e.SignalTime:HH:mm:ss:fff}: {GC.GetTotalMemory(true)} bytes");
-            };
+            _timer.Elapsed += (o, e) => Console.WriteLine($"total memory using at {e.SignalTime:HH:mm:ss:fff}: {GC.GetTotalMemory(true)} bytes");
             _timer.Start();
 
-            _es = new ElectroScene(this) { Enabled = true };
+            _es = new SWScene(this) { Enabled = true };
         }
 
         // Contains overrided methods from OpenTK to render
@@ -81,6 +78,8 @@ namespace PhysicsSim
             GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
 
             GL.LineWidth(2f);
+
+            base.OnLoad(e);
         }
 
         /// <summary>
@@ -200,5 +199,19 @@ namespace PhysicsSim
         }
 
         #endregion
+
+        /// <summary>
+        /// Get projection matrix for rendering, which is a orthographic projection matrix
+        /// </summary>
+        /// <returns>The orthographic matrix</returns>
+        public static Matrix4 GetProjection(float width, float height)
+            => Matrix4.CreateOrthographic(width, height, -1f, 1f);
+
+        /// <summary>
+        /// Convert input coordinate to system coordinate
+        /// </summary>
+        /// <returns>System coordinate</returns>
+        public static System.Numerics.Vector2 ScreenToCoord(int x, int y, float width, float height)
+            => new System.Numerics.Vector2(x - width / 2f, -y + height / 2f);
     }
 }

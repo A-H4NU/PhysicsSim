@@ -56,6 +56,8 @@ namespace PhysicsSim
                     outrad = radius + thickness;
                     inrad = radius;
                     break;
+                default:
+                    throw new ArgumentException("Invalid argument", "borderType");
             }
             ColoredVertex[] result = new ColoredVertex[2 * precision + 2];
             for (int i = 0; i <= precision; ++i)
@@ -88,6 +90,46 @@ namespace PhysicsSim
                 new ColoredVertex(new Vector4(-width, -height, 0, 1), color)
             };
             return (result, PrimitiveType.Triangles);
+        }
+
+        public static (ColoredVertex[], PrimitiveType) RectangleEdge(
+            float width,
+            float height,
+            float linewidth,
+            Color4 color,
+            BorderType borderType = BorderType.Middle)
+        {
+            float inwidth = -1f, outwidth = -1f, inheight = -1f, outheight = -1f;
+            switch (borderType)
+            {
+                case BorderType.Inner:
+                    inwidth = width - linewidth * 2; outwidth = width;
+                    inheight = height - linewidth * 2; outheight = height;
+                    break;
+                case BorderType.Middle:
+                    inwidth = width - linewidth; outwidth = width + linewidth;
+                    inheight = height - linewidth; outheight = height + linewidth;
+                    break;
+                case BorderType.Outter:
+                    inwidth = width; outwidth = width + linewidth * 2;
+                    inheight = height; outheight = height + linewidth * 2;
+                    break;
+            }
+            inwidth /= 2f; outwidth /= 2f; inheight /= 2f; outheight /= 2f;
+            var vertices = new ColoredVertex[]
+            {
+                new ColoredVertex(new Vector4(+inwidth, +inheight, 0, 1), color),
+                new ColoredVertex(new Vector4(+outwidth, +outheight, 0, 1), color),
+                new ColoredVertex(new Vector4(-inwidth, +inheight, 0, 1), color),
+                new ColoredVertex(new Vector4(-outwidth, +outheight, 0, 1), color),
+                new ColoredVertex(new Vector4(-inwidth, -inheight, 0, 1), color),
+                new ColoredVertex(new Vector4(-outwidth, -outheight, 0, 1), color),
+                new ColoredVertex(new Vector4(+inwidth, -inheight, 0, 1), color),
+                new ColoredVertex(new Vector4(+outwidth, -outheight, 0, 1), color),
+                new ColoredVertex(new Vector4(+inwidth, +inheight, 0, 1), color),
+                new ColoredVertex(new Vector4(+outwidth, +outheight, 0, 1), color),
+            };
+            return (vertices, PrimitiveType.TriangleStrip);
         }
 
         public static (ColoredVertex[], PrimitiveType) Curve(

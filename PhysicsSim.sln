@@ -7,20 +7,25 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhysicsSim", "PhysicsSim\Ph
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hanu.ElectroLib", "Hanu.ElectroLib\Hanu.ElectroLib.csproj", "{3CAA37E3-626B-4A5A-9F29-9899EC54222A}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{EE2B377D-1D9E-4916-9DFF-FF15154FCEF6}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{3CAA37E3-626B-4A5A-9F29-9899EC54222A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{3CAA37E3-626B-4A5A-9F29-9899EC54222A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{3CAA37E3-626B-4A5A-9F29-9899EC54222A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{3CAA37E3-626B-4A5A-9F29-9899EC54222A}.Release|Any CPU.Build.0 = Release|Any CPU
 		{E9F74E8B-FA08-4F0B-9E7B-483B3CFBAAB3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{E9F74E8B-FA08-4F0B-9E7B-483B3CFBAAB3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E9F74E8B-FA08-4F0B-9E7B-483B3CFBAAB3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E9F74E8B-FA08-4F0B-9E7B-483B3CFBAAB3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3CAA37E3-626B-4A5A-9F29-9899EC54222A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3CAA37E3-626B-4A5A-9F29-9899EC54222A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3CAA37E3-626B-4A5A-9F29-9899EC54222A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3CAA37E3-626B-4A5A-9F29-9899EC54222A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
