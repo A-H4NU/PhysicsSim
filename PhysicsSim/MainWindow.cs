@@ -1,21 +1,14 @@
-﻿using PhysicsSim.Scenes;
-using PhysicsSim.VBOs;
-using PhysicsSim.Vertices;
-
-using Hanu.ElectroLib.Objects;
-using Hanu.ElectroLib.Physics;
-
-using OpenTK;
+﻿using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Input;
 
+using PhysicsSim.Scenes;
+using PhysicsSim.VBOs;
+
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Timers;
 
 namespace PhysicsSim
@@ -36,7 +29,7 @@ namespace PhysicsSim
 
         private readonly Timer _timer;
 
-        private SWScene _es;
+        private ElectroScene _es;
 
         private TexturedRenderObject _tro;
 
@@ -48,7 +41,7 @@ namespace PhysicsSim
             _timer.Elapsed += (o, e) => Console.WriteLine($"total memory using at {e.SignalTime:HH:mm:ss:fff}: {GC.GetTotalMemory(true)} bytes");
             _timer.Start();
 
-            _es = new SWScene(this) { Enabled = true };
+            _es = new ElectroScene(this) { Enabled = true };
         }
 
         // Contains overrided methods from OpenTK to render
@@ -93,7 +86,7 @@ namespace PhysicsSim
             base.OnResize(e);
         }
 
-        
+
 
         public double Time { get; private set; } = 0.0;
         protected override void OnUpdateFrame(FrameEventArgs e)

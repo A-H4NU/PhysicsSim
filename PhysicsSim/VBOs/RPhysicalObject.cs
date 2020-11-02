@@ -1,9 +1,9 @@
-﻿using PhysicsSim.Scenes;
-
-using Hanu.ElectroLib.Objects;
+﻿using Hanu.ElectroLib.Objects;
 
 using OpenTK;
 using OpenTK.Graphics;
+
+using PhysicsSim.Scenes;
 
 using System.Collections.Generic;
 using System.Linq;

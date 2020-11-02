@@ -1,20 +1,18 @@
-﻿using PhysicsSim.VBOs;
+﻿using Hanu.ElectroLib.Objects;
+using Hanu.ElectroLib.Physics;
 
 using OpenTK;
-using OpenTK.Input;
+using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL4;
+using OpenTK.Input;
+
+using PhysicsSim.VBOs;
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Hanu.ElectroLib.Physics;
-using Hanu.ElectroLib.Objects;
 using System.Diagnostics;
-using OpenTK.Graphics;
-using System.Runtime.InteropServices;
-using System.Security.Permissions;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace PhysicsSim.Scenes
 {
@@ -61,12 +59,18 @@ namespace PhysicsSim.Scenes
         /// </summary>
         protected override void OnUpdateFrame(object sender, FrameEventArgs e)
         {
-            if (!Enabled) return;
+            if (!Enabled)
+            {
+                return;
+            }
         }
 
         protected override void OnRenderFrame(object sender, FrameEventArgs e)
         {
-            if (!Enabled) return;
+            if (!Enabled)
+            {
+                return;
+            }
             // Clear the used buffer to paint a new frame onto it
             GL.Clear(ClearBufferMask.ColorBufferBit);
 
@@ -95,7 +99,10 @@ namespace PhysicsSim.Scenes
 
         protected override void OnMouseDown(object sender, MouseButtonEventArgs e)
         {
-            if (!Enabled) return;
+            if (!Enabled)
+            {
+                return;
+            }
 
             System.Numerics.Vector2 pos = MainWindow.ScreenToCoord(e.X, e.Y, _window.Width, _window.Height) / Scale;
             if (e.Button == MouseButton.Left)
@@ -108,7 +115,7 @@ namespace PhysicsSim.Scenes
             {
                 if (_pObjs.Count != 0)
                 {
-                    var ef = PSystem.GetElectricFieldAt(_pObjs.Extracted(), pos);
+                    System.Numerics.Vector2 ef = PSystem.GetElectricFieldAt(_pObjs.Extracted(), pos);
                     Console.WriteLine($"Electric field at {pos,15}: {ef.Length(),9:F2} N/C, {Math.Atan2(ef.Y, ef.X) * 180 / Math.PI,7:F2}°");
                 }
             }
@@ -116,7 +123,10 @@ namespace PhysicsSim.Scenes
 
         protected override void OnMouseWheel(object sender, MouseWheelEventArgs e)
         {
-            if (!Enabled) return;
+            if (!Enabled)
+            {
+                return;
+            }
 
             if (_pObjs.Count > 0)
             {
@@ -126,7 +136,10 @@ namespace PhysicsSim.Scenes
 
         protected override async void OnKeyDown(object sender, KeyboardKeyEventArgs e)
         {
-            if (!Enabled) return;
+            if (!Enabled)
+            {
+                return;
+            }
 
             if (e.Key == Key.F11)
             {
@@ -149,7 +162,7 @@ namespace PhysicsSim.Scenes
                     stopwatch.Start();
 
                     // Dispose elements in _lines and clear it
-                    foreach (var line in _lines)
+                    foreach (ARenderable line in _lines)
                     {
                         line.Dispose();
                     }
@@ -157,25 +170,33 @@ namespace PhysicsSim.Scenes
 
                     // get the number of lines needed
                     int linecount = 0;
-                    foreach (var obj in _pObjs)
+                    foreach (RPhysicalObject obj in _pObjs)
                     {
-                        if (obj.PObject.Charge <= 0) continue;
+                        if (obj.PObject.Charge <= 0)
+                        {
+                            continue;
+                        }
+
                         linecount += (int)(obj.PObject.Charge / UnitCharge) * LinePerUnitCharge;
                     }
 
-                    var taskList = new List<Task<List<System.Numerics.Vector2>>>(linecount);
-                    foreach (var obj in _pObjs)
+                    List<Task<List<System.Numerics.Vector2>>> taskList = new List<Task<List<System.Numerics.Vector2>>>(linecount);
+                    foreach (RPhysicalObject obj in _pObjs)
                     {
-                        if (obj.PObject.Charge < 0) continue;
+                        if (obj.PObject.Charge < 0)
+                        {
+                            continue;
+                        }
+
                         int units = (int)(obj.PObject.Charge / UnitCharge);
                         for (int i = 0; i < units * LinePerUnitCharge; ++i)
                         {
                             double angle = 2*i*Math.PI / (units*LinePerUnitCharge);
                             // relative displacement with respect to the position of the charge
-                            var delta = new System.Numerics.Vector2(
+                            System.Numerics.Vector2 delta = new System.Numerics.Vector2(
                                 (float)Math.Cos(angle), (float)Math.Sin(angle)) * RPhysicalObject.Radius / Scale;
                             // create new task that calculates an electric field line from the specified starting point
-                            var task = PLine.ElectricFieldLineAsync(
+                            Task<List<System.Numerics.Vector2>> task = PLine.ElectricFieldLineAsync(
                                 system: _pObjs.Extracted(),             // list of physical objects
                                 initPos: obj.PObject.Position + delta,  // starting point of the line
                                 endFunc: (t, v)                         // ending function (calculation stops if true)
@@ -188,11 +209,11 @@ namespace PhysicsSim.Scenes
                     while (taskList.Any())
                     {
                         // await the next task which is finished
-                        var finished = await Task.WhenAny(taskList);
+                        Task<List<System.Numerics.Vector2>> finished = await Task.WhenAny(taskList);
                         // remove the finished task from the list
                         taskList.Remove(finished);
                         // get the result from the finished task
-                        var result = await finished;
+                        List<System.Numerics.Vector2> result = await finished;
                         // add the line to _lines list
                         _lines.Add(new RenderObject(ObjectFactory.Curve(result, Color4.White), _window.ColoredProgram) { Scale = new Vector3(Scale, Scale, 1) });
                     }

@@ -1,5 +1,4 @@
 ﻿using OpenTK;
-using OpenTK.Graphics.OpenGL4;
 
 using System;
 
@@ -7,6 +6,8 @@ namespace PhysicsSim.VBOs
 {
     public abstract class ARenderable : IDisposable
     {
+        public bool Enabled { get; set; } = true;
+
         public Vector3 Position { get; set; } = Vector3.Zero;
         public Vector3 Rotation { get; set; } = Vector3.Zero;
         public Vector3 Scale { get; set; } = Vector3.One;
@@ -37,9 +38,10 @@ namespace PhysicsSim.VBOs
         /// <param name="translation">additional transition</param>
         /// <param name="rotation">additional rotation</param>
         /// <param name="scale">additional scaling</param>
-        /// <returns></returns>
+        /// <returns><see cref="Matrix4.Zero"/> when not enabled</returns>
         public virtual Matrix4 GetModelView(Vector3 translation, Vector3 rotation, Vector3 scale)
         {
+            if (!Enabled) return Matrix4.Zero;
             Matrix4 t = Matrix4.CreateTranslation(Position + translation);
             Matrix4 r = Matrix4.CreateRotationX(Rotation.X + rotation.X)
                 * Matrix4.CreateRotationY(Rotation.Y + rotation.Y)

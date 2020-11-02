@@ -1,8 +1,8 @@
-﻿using PhysicsSim.Vertices;
-
-using OpenTK;
+﻿using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL4;
+
+using PhysicsSim.Vertices;
 
 using System;
 using System.Collections.Generic;
@@ -31,7 +31,7 @@ namespace PhysicsSim
 
         public enum BorderType
         {
-            Inner, Middle , Outter
+            Inner, Middle, Outter
         }
 
         public static (ColoredVertex[], PrimitiveType) HollowCircle(
@@ -116,7 +116,7 @@ namespace PhysicsSim
                     break;
             }
             inwidth /= 2f; outwidth /= 2f; inheight /= 2f; outheight /= 2f;
-            var vertices = new ColoredVertex[]
+            ColoredVertex[] vertices = new ColoredVertex[]
             {
                 new ColoredVertex(new Vector4(+inwidth, +inheight, 0, 1), color),
                 new ColoredVertex(new Vector4(+outwidth, +outheight, 0, 1), color),
@@ -136,7 +136,7 @@ namespace PhysicsSim
             IEnumerable<System.Numerics.Vector2> curve,
             Color4 color)
         {
-            var array = curve.ToArray();
+            System.Numerics.Vector2[] array = curve.ToArray();
             ColoredVertex[] result = new ColoredVertex[array.Length];
             for (int i = 0; i < result.Length; ++i)
             {
@@ -145,9 +145,29 @@ namespace PhysicsSim
             return (result, PrimitiveType.LineStrip);
         }
 
-        public static (ColoredVertex[], PrimitiveType) Curve(Color4 color, params System.Numerics.Vector2[] points)
+        public static (ColoredVertex[], PrimitiveType) Curve(
+            Color4 color,
+            params System.Numerics.Vector2[] points)
         {
             return Curve(points, color);
+        }
+
+        public static (ColoredVertex[], PrimitiveType) CheckMark(
+            float width,
+            float height,
+            Color4 color)
+        {
+            ColoredVertex[] result = new ColoredVertex[]
+            {
+                new ColoredVertex(new Vector4(-0.0852f*width, -0.3510f*height, 0f, 1f), color),
+                new ColoredVertex(new Vector4(+0.3520f*width, +0.2360f*height, 0f, 1f), color),
+                new ColoredVertex(new Vector4(+0.2554f*width, +0.3080f*height, 0f, 1f), color),
+                new ColoredVertex(new Vector4(-0.0820f*width, -0.1450f*height, 0f, 1f), color),
+                new ColoredVertex(new Vector4(-0.0820f*width, -0.1450f*height, 0f, 1f), color),
+                new ColoredVertex(new Vector4(-0.2464f*width, +0.0193f*height, 0f, 1f), color),
+                new ColoredVertex(new Vector4(-0.3510f*width, -0.0854f*height, 0f, 1f), color),
+            };
+            return (result, PrimitiveType.TriangleFan);
         }
 
         public static (TexturedVertex[], PrimitiveType) TexRectangle(
