@@ -24,6 +24,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <UseVSHostingProcess>true</UseVSHostingProcess>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -53,10 +54,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Interactions\ARectangularInteraction.cs" />
+    <Compile Include="Interactions\ATexturedInteraction.cs" />
     <Compile Include="Interactions\IArea.cs" />
     <Compile Include="Interactions\ICheckBox.cs" />
     <Compile Include="Interactions\RectangularButton.cs" />
     <Compile Include="Interactions\RectangularCheckBox.cs" />
+    <Compile Include="Interactions\TexturedButton.cs" />
     <Compile Include="MainWindow.cs" />
     <Compile Include="ObjectFactory.cs" />
     <Compile Include="Program.cs" />
@@ -87,6 +90,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="Shaders\textured_vertex_shader.vert">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Shaders\wave_vertex_shader.vert">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

@@ -1,22 +1,27 @@
 ﻿using OpenTK;
 using OpenTK.Graphics;
+using OpenTK.Graphics.ES20;
 
 using PhysicsSim.VBOs;
 
 using System;
+using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace PhysicsSim.Interactions
 {
-    public abstract class ARectangularInteraction : ARenderable
+    public abstract class ATexturedInteraction : ARenderable
     {
         public static float DefaultLineWidth = 5f;
 
-        protected ROCollection _render;
-
         protected bool _disposed;
 
-        protected int _program;
+        protected ROCollection _render;
+
+        protected int _colorProgram, _textureProgram;
 
         protected float _width;
         public float Width
@@ -60,6 +65,8 @@ namespace PhysicsSim.Interactions
             }
         }
 
+        private readonly string _filePath;
+
         protected Color4? _lineColor;
         public Color4? LineColor
         {
@@ -73,21 +80,6 @@ namespace PhysicsSim.Interactions
                 }
             }
         }
-
-        protected Color4 _fillColor;
-        public Color4 FillColor
-        {
-            get => _fillColor;
-            set
-            {
-                if (_fillColor != value)
-                {
-                    _fillColor = value;
-                    LoadObject();
-                }
-            }
-        }
-
         public RectangleF Area
         {
             get => new RectangleF(Position.X - _width / 2f, Position.Y - _height / 2f, _width, _height);
@@ -107,34 +99,32 @@ namespace PhysicsSim.Interactions
             }
         }
 
-        public ARectangularInteraction(float width, float height, float lineWidth, Color4 fillColor, Color4 lineColor, int program)
+        public ATexturedInteraction(float width, float height, float lineWidth, Color4 lineColor, string filepath, int colorProgram, int textureProgram)
+            : this(width, height, filepath, colorProgram, textureProgram)
         {
-            _width = width;
-            _height = height;
             _lineWidth = lineWidth;
-            _fillColor = fillColor;
             _lineColor = lineColor;
-            _program = program;
         }
 
-        public ARectangularInteraction(float width, float height, Color4 fillColor, int program)
+        public ATexturedInteraction(float width, float height, string filepath, int colorProgram, int textureProgram)
         {
             _width = width;
             _height = height;
+            _filePath = filepath;
+            _colorProgram = colorProgram;
+            _textureProgram = textureProgram;
             _lineWidth = DefaultLineWidth;
-            _fillColor = fillColor;
             _lineColor = null;
-            _program = program;
         }
 
-        public ARectangularInteraction(RectangleF rec, float lineWidth, Color4 fillColor, Color4 lineColor, int program)
-            : this(rec.Width, rec.Height, lineWidth, fillColor, lineColor, program)
+        public ATexturedInteraction(RectangleF rec, float lineWidth, Color4 lineColor, string filePath, int colorProgram, int textureProgram)
+            : this(rec.Width, rec.Height, lineWidth, lineColor, filePath, colorProgram, textureProgram)
         {
             Position = new Vector3(rec.X + rec.Width / 2f, rec.Y + rec.Height / 2f, 0f);
         }
 
-        public ARectangularInteraction(RectangleF rec, Color4 fillColor, int program)
-            : this(rec.Width, rec.Height, fillColor, program)
+        public ATexturedInteraction(RectangleF rec, string filePath, int colorProgram, int textureProgram)
+            : this(rec.Width, rec.Height, filePath, colorProgram, textureProgram)
         {
             Position = new Vector3(rec.X + rec.Width / 2f, rec.Y + rec.Height / 2f, 0f);
         }
@@ -146,16 +136,32 @@ namespace PhysicsSim.Interactions
                 throw new ObjectDisposedException("_render");
             }
             _render?.Dispose();
-            RenderObject[] renders = new RenderObject[_lineColor == null ? 1 : 2];
-            renders[0] = new RenderObject(ObjectFactory.Rectangle(_width, _height, _fillColor), _program);
+            List<ARenderable> renders = new List<ARenderable>()
+            {
+                new TexturedRenderObject(
+                    ObjectFactory.TexRectangle(_width, _height),
+                    _filePath,
+                    _textureProgram)
+            };
             if (_lineColor != null)
             {
-                renders[1] = new RenderObject(ObjectFactory.RectangleEdge(_width, _height, _lineWidth, _lineColor.Value), _program);
+                renders.Add(new RenderObject(
+                    ObjectFactory.RectangleEdge(_width, _height, _lineWidth, _lineColor.Value),
+                    _colorProgram));
             }
             _render = new ROCollection(renders)
             {
                 Position = new Vector3(Position.X, Position.Y, 0)
             };
+        }
+
+        public override void Dispose()
+        {
+            if (!_disposed)
+            {
+                _render.Dispose();
+                _render = null;
+            }
         }
     }
 }

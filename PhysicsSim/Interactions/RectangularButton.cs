@@ -12,14 +12,14 @@ namespace PhysicsSim.Interactions
 
         #region Contructors
 
-        public RectangularButton(float x, float y, float width, float height, float lineWidth, Color4 fillColor, Color4 lineColor, int program)
-            : base(x, y, width, height, lineWidth, fillColor, lineColor, program)
+        public RectangularButton(float width, float height, float lineWidth, Color4 fillColor, Color4 lineColor, int program)
+            : base(width, height, lineWidth, fillColor, lineColor, program)
         {
             LoadObject();
         }
 
-        public RectangularButton(float x, float y, float width, float height, Color4 fillColor, int program)
-            : base(x, y, width, height, fillColor, program)
+        public RectangularButton(float width, float height, Color4 fillColor, int program)
+            : base(width, height, fillColor, program)
         {
             LoadObject();
         }

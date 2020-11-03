@@ -28,15 +28,15 @@ namespace PhysicsSim.Interactions
 
         #region Contructors
 
-        public RectangularCheckBox(float x, float y, float width, float height, float lineWidth, Color4 fillColor, Color4 lineColor, Color4 checkColor, int program)
-            : base(x, y, width, height, lineWidth, fillColor, lineColor, program)
+        public RectangularCheckBox(float width, float height, float lineWidth, Color4 fillColor, Color4 lineColor, Color4 checkColor, int program)
+            : base(width, height, lineWidth, fillColor, lineColor, program)
         {
             _checkColor = checkColor;
             LoadObject();
         }
 
-        public RectangularCheckBox(float x, float y, float width, float height, Color4 fillColor, Color4 checkColor, int program)
-            : base(x, y, width, height, fillColor, program)
+        public RectangularCheckBox(float width, float height, Color4 fillColor, Color4 checkColor, int program)
+            : base(width, height, fillColor, program)
         {
             _checkColor = checkColor;
             LoadObject();
@@ -89,7 +89,10 @@ namespace PhysicsSim.Interactions
                 Toggle();
                 return true;
             }
-            return false;
+            else
+            {
+                return false;
+            }
         }
 
         public void Toggle()
