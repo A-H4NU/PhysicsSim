@@ -14,11 +14,6 @@ namespace PhysicsSim.Interactions
     {
         public event EventHandler ButtonPressEvent;
 
-        public bool IsNull()
-        {
-            return ButtonPressEvent == null;
-        }
-
         #region Constructors
 
         public TexturedButton(float width, float height, float lineWidth, Color4 lineColor, string filepath, int coloredProgram, int textureProgram)
