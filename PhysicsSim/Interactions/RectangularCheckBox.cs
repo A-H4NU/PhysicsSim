@@ -114,7 +114,9 @@ namespace PhysicsSim.Interactions
             renders.Add(new RenderObject(ObjectFactory.Rectangle(_width, _height, _fillColor), _program));
             if (_lineColor != null)
             {
-                renders.Add(new RenderObject(ObjectFactory.RectangleEdge(_width, _height, _lineWidth, _lineColor.Value), _program));
+                renders.Add(new RenderObject(
+                    ObjectFactory.RectangleEdge(_width, _height, _lineWidth, _lineColor.Value, ObjectFactory.BorderType.Inner),
+                    _program));
             }
             renders.Add(new RenderObject(ObjectFactory.CheckMark(_width, _height, _checkColor), _program) { Enabled = IsChecked });
             _render = new ROCollection(renders)

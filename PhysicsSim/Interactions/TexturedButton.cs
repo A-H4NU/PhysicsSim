@@ -14,15 +14,20 @@ namespace PhysicsSim.Interactions
     {
         public event EventHandler ButtonPressEvent;
 
+        public bool IsNull()
+        {
+            return ButtonPressEvent == null;
+        }
+
         #region Constructors
 
-        public TexturedButton(float x, float y, float width, float height, float lineWidth, Color4 lineColor, string filepath, int coloredProgram, int textureProgram)
+        public TexturedButton(float width, float height, float lineWidth, Color4 lineColor, string filepath, int coloredProgram, int textureProgram)
             : base(width, height, lineWidth, lineColor, filepath, coloredProgram, textureProgram)
         {
             LoadObject();
         }
 
-        public TexturedButton(float x, float y, float width, float height, string filepath, int coloredProgram, int textureProgram)
+        public TexturedButton(float width, float height, string filepath, int coloredProgram, int textureProgram)
             : base(width, height, filepath, coloredProgram, textureProgram)
         {
             LoadObject();

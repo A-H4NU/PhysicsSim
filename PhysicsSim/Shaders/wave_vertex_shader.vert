@@ -34,16 +34,14 @@ void main(void)
     while (time * speed > 2 * n * len + x && n <= 10)
     {
         float para = angularFrequency * (time - len / speed * n) - wavenumber * (x + len * n);
-        res += pow(0.7, n + 1) * amp * sooth(para) * sin(para);
+        res += pow(0.8, n) * amp * sooth(para) * sin(para);
         n += 1;
     }
     n = 1;
     while (time * speed > len * 2 * n- x && n <= 11)
     {
         float para = angularFrequency * (time - len / speed * n) + wavenumber * (x - len * n);
-        res -= pow(0.6, n - 1) * amp
-            * sooth(para)
-            * sin(para);
+        res -= pow(0.8, n - 1) * amp * sooth(para) * sin(para);
         n += 1;
     }
     vec4 pos = vec4(position.x, res, 0, 1);

@@ -11,6 +11,7 @@ using PhysicsSim.VBOs;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -63,6 +64,7 @@ namespace PhysicsSim.Scenes
             {
                 return;
             }
+            Time += (float)e.Time;
         }
 
         protected override void OnRenderFrame(object sender, FrameEventArgs e)
@@ -99,7 +101,7 @@ namespace PhysicsSim.Scenes
 
         protected override void OnMouseDown(object sender, MouseButtonEventArgs e)
         {
-            if (!Enabled)
+            if (!Enabled || Time <= 0.05f)
             {
                 return;
             }
@@ -241,6 +243,21 @@ namespace PhysicsSim.Scenes
             _pObjs.Clear();
             _lines = null;
             _pObjs = null;
+        }
+
+        public override void Initialize()
+        {
+            Time = 0f;
+            foreach (RPhysicalObject obj in _pObjs)
+            {
+                obj.Dispose();
+            }
+            foreach (RenderObject obj in _lines)
+            {
+                obj.Dispose();
+            }
+            _pObjs.Clear();
+            _lines.Clear();
         }
     }
 }

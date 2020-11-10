@@ -150,7 +150,9 @@ namespace PhysicsSim.Interactions
             renders[0] = new RenderObject(ObjectFactory.Rectangle(_width, _height, _fillColor), _program);
             if (_lineColor != null)
             {
-                renders[1] = new RenderObject(ObjectFactory.RectangleEdge(_width, _height, _lineWidth, _lineColor.Value), _program);
+                renders[1] = new RenderObject(
+                    ObjectFactory.RectangleEdge(_width, _height, _lineWidth, _lineColor.Value, ObjectFactory.BorderType.Middle),
+                    _program);
             }
             _render = new ROCollection(renders)
             {

@@ -31,8 +31,6 @@ namespace PhysicsSim
 
         private Scene _es;
 
-        private TexturedRenderObject _tro;
-
         private string _title;
 
         public MainWindow(int width, int height)
@@ -43,7 +41,7 @@ namespace PhysicsSim
             _timer.Elapsed += (o, e) => Console.WriteLine($"total memory using at {e.SignalTime:HH:mm:ss:fff}: {GC.GetTotalMemory(true)} bytes");
             _timer.Start();
 
-            _es = new SWScene(this) { Enabled = true };
+            _es = new MenuScene(this) { Enabled = true };
 
             _title = "PhysicsSim";
         }
@@ -62,8 +60,6 @@ namespace PhysicsSim
             // Create a new program that is used when rendering
             ColoredProgram = CreateProgram(ColoredVertexShaderPath, ColoredFragmentShaderPath);
             TexturedProgram = CreateProgram(TexturedVertexShaderPath, TexturedFragmentShaderPath);
-
-            _tro = new TexturedRenderObject(ObjectFactory.TexRectangle(900f, 900f), @"Textures\unnamed3.jpeg", TexturedProgram);
 
             // Fill each face no matter it is a front face or not
             GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Fill);
@@ -96,7 +92,6 @@ namespace PhysicsSim
         protected override void OnUpdateFrame(FrameEventArgs e)
         {
             Time += e.Time;
-            HandleKeyboard();
 
             base.OnUpdateFrame(e);
         }
@@ -106,14 +101,6 @@ namespace PhysicsSim
             Title = $"{_title} ({RenderFrequency:F0} FPS)";
 
             base.OnRenderFrame(e);
-
-            //GL.Clear(ClearBufferMask.ColorBufferBit);
-
-            //Matrix4 projection = Matrix4.CreateOrthographic(Width, Height, -1f, 1f);
-
-            //_tro.Render(ref projection);
-
-            //SwapBuffers();
         }
 
         /// <summary>
@@ -125,23 +112,6 @@ namespace PhysicsSim
             GC.Collect();
 
             base.OnClosed(e);
-        }
-
-        #endregion
-
-        // Contains overrided methods from OpenTK and others to handling inputs
-        #region Input Handling
-
-        /// <summary>
-        /// Handling keyboard input, called in every frame
-        /// </summary>
-        private void HandleKeyboard()
-        {
-            KeyboardState state = Keyboard.GetState();
-            if (state.IsKeyDown(Key.Escape))
-            {
-                Close();
-            }
         }
 
         #endregion

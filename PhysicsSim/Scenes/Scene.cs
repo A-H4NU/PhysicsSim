@@ -9,7 +9,7 @@ namespace PhysicsSim.Scenes
     {
         protected readonly MainWindow _window;
 
-        public double Time { get => _window.Time; }
+        public float Time;
 
         public bool Enabled { get; set; } = false;
 
@@ -72,6 +72,8 @@ namespace PhysicsSim.Scenes
         /// <para>Do work only when <see cref="Enabled"/> == <see cref="true"/></para>
         /// </summary>
         protected virtual void OnKeyDown(object sender, KeyboardKeyEventArgs e) { }
+
+        public abstract void Initialize();
 
         public abstract void Dispose();
     }
