@@ -36,7 +36,7 @@ namespace PhysicsSim
 
         private readonly Timer _timer;
 
-        private ElectroScene _es;
+        private BeatScene _es;
 
         private TexturedRenderObject _tro;
 
@@ -51,7 +51,7 @@ namespace PhysicsSim
             };
             _timer.Start();
 
-            _es = new ElectroScene(this) { Enabled = true };
+            _es = new BeatScene(this) { Enabled = true };
         }
 
         // Contains overrided methods from OpenTK to render
@@ -101,15 +101,17 @@ namespace PhysicsSim
         {
             Time += e.Time;
             HandleKeyboard();
+
+            base.OnUpdateFrame(e);
         }
 
         protected override void OnRenderFrame(FrameEventArgs e)
         {
             base.OnRenderFrame(e);
 
-            //GL.Clear(ClearBufferMask.ColorBufferBit);
+            GL.Clear(ClearBufferMask.ColorBufferBit);
 
-            //Matrix4 projection = Matrix4.CreateOrthographic(Width, Height, -1f, 1f);
+            Matrix4 projection = Matrix4.CreateOrthographic(Width, Height, -1f, 1f);
 
             //_tro.Render(ref projection);
 
