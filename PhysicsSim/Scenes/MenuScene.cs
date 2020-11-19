@@ -27,7 +27,8 @@ namespace PhysicsSim.Scenes
             {
                 this,
                 new ElectroScene(_window),
-                new SWScene(_window)
+                new SWScene(_window),
+                new BeatScene(_window)
             };
         }
 
@@ -44,7 +45,8 @@ namespace PhysicsSim.Scenes
             _buttons.AddRange(new TexturedButton[]
             {
                 new TexturedButton(500f, 500f, 5f, border, @"Textures\electro.jpg", _window.ColoredProgram, _window.TexturedProgram),
-                new TexturedButton(500f, 500f, 5f, border, @"Textures\standing_wave.jpg", _window.ColoredProgram, _window.TexturedProgram)
+                new TexturedButton(500f, 500f, 5f, border, @"Textures\standing_wave.jpg", _window.ColoredProgram, _window.TexturedProgram),
+                new TexturedButton(500f, 500f, 5f, border, @"Textures\beat_wave.jpg", _window.ColoredProgram, _window.TexturedProgram)
             });
             for (int i = 0; i < _buttons.Count; ++i)
             {;

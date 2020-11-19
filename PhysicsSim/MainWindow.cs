@@ -41,6 +41,7 @@ namespace PhysicsSim
             _timer.Elapsed += (o, e) => Console.WriteLine($"total memory using at {e.SignalTime:HH:mm:ss:fff}: {GC.GetTotalMemory(true)} bytes");
             _timer.Start();
 
+            //_es = new MenuScene(this) { Enabled = true };
             _es = new MenuScene(this) { Enabled = true };
 
             _title = "PhysicsSim";
