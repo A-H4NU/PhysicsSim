@@ -128,6 +128,7 @@ namespace PhysicsSim.Scenes
                 else
                 {
                     ActivateScene(0);
+                    RearrangeButtons();
                 }
             }
         }

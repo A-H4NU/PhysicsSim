@@ -1,16 +1,58 @@
 ﻿using OpenTK;
 
+using PhysicsSim.ComponentModel;
+using PhysicsSim.Events;
+using PhysicsSim.Exceptions;
+
 using System;
 
 namespace PhysicsSim.VBOs
 {
-    public abstract class ARenderable : IDisposable
+    public abstract class ARenderable : IDisposable, INotifyRenderPropertyChanged
     {
         public bool Enabled { get; set; } = true;
 
-        public Vector3 Position { get; set; } = Vector3.Zero;
-        public Vector3 Rotation { get; set; } = Vector3.Zero;
-        public Vector3 Scale { get; set; } = Vector3.One;
+        private Vector3 _position = Vector3.Zero;
+        public virtual Vector3 Position
+        {
+            get => _position;
+            set
+            {
+                var old = _position;
+                _position = value;
+                PositionChangedEvent?.Invoke(this, new RenderChangedEventArgs(old, value));
+            }
+        }
+
+        private Vector3 _rotation = Vector3.Zero;
+        public virtual Vector3 Rotation
+        {
+            get => _rotation;
+            set
+            {
+                var old = _rotation;
+                _rotation = value;
+                RotationChangedEvent?.Invoke(this, new RenderChangedEventArgs(old, value));
+            }
+        }
+
+        private Vector3 _scale = Vector3.One;
+        public virtual Vector3 Scale
+        {
+            get => _scale;
+            set
+            {
+                var old = _scale;
+                _scale = value;
+                ScaleChangedEvent?.Invoke(this, new RenderChangedEventArgs(old, value));
+            }
+        }
+        
+        public event EventHandler<RenderChangedEventArgs> PositionChangedEvent;
+        public event EventHandler<RenderChangedEventArgs> RotationChangedEvent;
+        public event EventHandler<RenderChangedEventArgs> ScaleChangedEvent;
+
+        protected BindType _boundFlag = BindType.None;
 
         public abstract void Dispose();
 
@@ -49,5 +91,55 @@ namespace PhysicsSim.VBOs
             Matrix4 s = Matrix4.CreateScale(Scale * scale);
             return t * r * s;
         }
+
+        /// <exception cref="ArgumentException"></exception>
+        /// <exception cref="AlreadyBoundException"></exception>
+        public virtual void BindProperty(INotifyRenderPropertyChanged renderObject, BindType bindType)
+        {
+            if (ReferenceEquals(this, renderObject))
+            {
+                throw new ArgumentException();
+            }
+            switch (bindType)
+            {
+                case BindType.None:
+                    return;
+                case BindType.Position:
+                    if ((_boundFlag & BindType.Position) != BindType.None)
+                    {
+                        throw new AlreadyBoundException();
+                    }
+                    Position = renderObject.Position;
+                    renderObject.PositionChangedEvent += (o, e) => Position = e.NewValue;
+                    _boundFlag |= BindType.Position;
+                    break;
+                case BindType.Rotation:
+                    if ((_boundFlag & BindType.Rotation) != BindType.None)
+                    {
+                        throw new AlreadyBoundException();
+                    }
+                    Rotation = renderObject.Rotation;
+                    renderObject.RotationChangedEvent += (o, e) => Rotation = e.NewValue;
+                    _boundFlag |= BindType.Rotation;
+                    break;
+                case BindType.Scale:
+                    if ((_boundFlag & BindType.Scale) != BindType.None)
+                    {
+                        throw new AlreadyBoundException();
+                    }
+                    Scale = renderObject.Scale;
+                    renderObject.ScaleChangedEvent += (o, e) => Scale = e.NewValue;
+                    _boundFlag |= BindType.Scale;
+                    break;
+                default:
+                    throw new ArgumentException("bindType");
+            }
+        }
+    }
+
+    [Flags]
+    public enum BindType
+    {
+        None = 0, Position = 1, Rotation = 2, Scale = 4
     }
 }

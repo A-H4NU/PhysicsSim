@@ -24,6 +24,8 @@ namespace PhysicsSim.Scenes
             _window.RenderFrame += OnRenderFrame;
             _window.Closed += OnClosed;
             _window.MouseDown += OnMouseDown;
+            _window.MouseUp += OnMouseUp;
+            _window.MouseMove += OnMouseMove;
             _window.MouseWheel += OnMouseWheel;
             _window.KeyDown += OnKeyDown;
         }
@@ -72,6 +74,18 @@ namespace PhysicsSim.Scenes
         /// <para>Do work only when <see cref="Enabled"/> == <see cref="true"/></para>
         /// </summary>
         protected virtual void OnKeyDown(object sender, KeyboardKeyEventArgs e) { }
+
+        /// <summary>
+        /// Called when a mouse up is detedted
+        /// <para>Do work only when <see cref="Enabled"/> == <see cref="true"/></para>
+        /// </summary>
+        protected virtual void OnMouseUp(object sender, MouseButtonEventArgs e) { }
+
+        /// <summary>
+        /// Called when a mouse movement is detedted
+        /// <para>Do work only when <see cref="Enabled"/> == <see cref="true"/></para>
+        /// </summary>
+        protected virtual void OnMouseMove(object sender, MouseMoveEventArgs e) { }
 
         public abstract void Initialize();
 

@@ -2,6 +2,7 @@
 using OpenTK.Graphics;
 
 using PhysicsSim.VBOs;
+using PhysicsSim.ComponentModel;
 
 using System;
 using System.Drawing;
@@ -158,6 +159,7 @@ namespace PhysicsSim.Interactions
             {
                 Position = new Vector3(Position.X, Position.Y, 0)
             };
+            _render.BindProperty(this, BindType.Position);
         }
     }
 }

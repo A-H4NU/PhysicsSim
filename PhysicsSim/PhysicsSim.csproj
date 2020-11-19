@@ -53,12 +53,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ComponentModel\INotifyRenderPropertyChanged.cs" />
+    <Compile Include="Events\RenderChangedEventArgs.cs" />
+    <Compile Include="Events\ValueChangedEventArgs.cs" />
+    <Compile Include="Exceptions\AlreadyBoundException.cs" />
     <Compile Include="Interactions\ARectangularInteraction.cs" />
     <Compile Include="Interactions\ATexturedInteraction.cs" />
     <Compile Include="Interactions\IArea.cs" />
     <Compile Include="Interactions\ICheckBox.cs" />
+    <Compile Include="Interactions\ISlider.cs" />
     <Compile Include="Interactions\RectangularButton.cs" />
     <Compile Include="Interactions\RectangularCheckBox.cs" />
+    <Compile Include="Interactions\StandardSlider.cs" />
     <Compile Include="Interactions\TexturedButton.cs" />
     <Compile Include="MainWindow.cs" />
     <Compile Include="ObjectFactory.cs" />

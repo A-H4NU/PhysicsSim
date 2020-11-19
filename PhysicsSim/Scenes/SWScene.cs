@@ -23,9 +23,11 @@ namespace PhysicsSim.Scenes
 
         public const float DefaultLength = 100f;
 
-        public const float DefaultFrequency = 3.75f;
+        public const float DefaultFrequency = 4.5f;
 
         private bool _working = false;
+
+        public static int WaveProgram;
 
         /// <summary> unit = m/s </summary>
         private float _speed = DefaultSpeed;
@@ -39,25 +41,28 @@ namespace PhysicsSim.Scenes
         /// <summary> unit = Hz </summary>
         private float _frequency = DefaultFrequency;
 
+        #region Renderables
+
         private RenderObject _wave;
 
         private RenderObject _circleL, _circleR;
 
         private ROCollection _ampLines;
 
-        public static int WaveProgram;
+        private RectangularButton _startButton;
 
-        private readonly Dictionary<string, RectangularButton> _buttons;
+        private StandardSlider _freqSlider;
+
+        #endregion
 
         public SWScene(MainWindow window) : base(window)
         {
-            _buttons = new Dictionary<string, RectangularButton>();
         }
 
         protected override void OnResize(object sender, EventArgs e)
         {
             _wave.Scale = new Vector3(_window.Width / _length, 1, 1);
-            _buttons["start"].Area = new RectangleF(_window.Width / 2f - 75f, -_window.Height / 2f + 15f, 60f, 60f);
+            _startButton.Area = new RectangleF(_window.Width / 2f - 75f, -_window.Height / 2f + 15f, 60f, 60f);
             _ampLines.Scale = new Vector3(_window.Width / _length, 1, 1);
         }
 
@@ -80,18 +85,16 @@ namespace PhysicsSim.Scenes
             };
 
             ///// BUTTONS /////
-            _buttons.Add(
-                "start",
-                new RectangularButton(
-                    new RectangleF(_window.Width / 2f - 75f, -_window.Height / 2f + 15f, 60f, 60f),
-                    ARectangularInteraction.DefaultLineWidth,
-                    Color4.Gray,
-                    Color4.White,
-                    _window.ColoredProgram));
-            _buttons["start"].ButtonPressEvent += (o, a) =>
+            _startButton = new RectangularButton(
+                                new RectangleF(_window.Width / 2f - 75f, -_window.Height / 2f + 15f, 60f, 60f),
+                                ARectangularInteraction.DefaultLineWidth,
+                                Color4.Gray,
+                                Color4.White,
+                                _window.ColoredProgram);
+            _startButton.ButtonPressEvent += (o, a) =>
             {
                 _working ^= true;
-                _buttons["start"].FillColor = _working ? Color4.Red : Color4.Gray;
+                _startButton.FillColor = _working ? Color4.Red : Color4.Gray;
             };
             ///////////////////
 
@@ -127,6 +130,16 @@ namespace PhysicsSim.Scenes
                 Scale = new Vector3(_window.Width / _length, 1, 1)
             };
 
+            _freqSlider = new StandardSlider(300, 30, 20, 0, 10, Color4.LightBlue, Color4.White, _window.ColoredProgram)
+            {
+                Position = new Vector3(-500, -300, 0)
+            };
+            _freqSlider.ValueChangedEvent += (o, ev) =>
+            {
+                _frequency = ev.NewValue;
+                UniformComponents();
+            };
+
             UniformComponents();
         }
 
@@ -143,12 +156,10 @@ namespace PhysicsSim.Scenes
             GL.UseProgram(WaveProgram);
             GL.Uniform1(24, Time);
             _wave.Render(ref projection);
-            foreach (var button in _buttons.Values)
-            {
-                button.Render(ref projection);
-            }
+            _startButton.Render(ref projection);
             _circleL.Render(ref projection);
             _circleR.Render(ref projection);
+            _freqSlider.Render(ref projection);
             _window.SwapBuffers();
         }
 
@@ -177,7 +188,28 @@ namespace PhysicsSim.Scenes
                 return;
             }
             var pos = MainWindow.ScreenToCoord(e.X, e.Y, _window.Width, _window.Height);
-            _buttons["start"].PressIfInside(pos);
+            _startButton.PressIfInside(pos);
+            _freqSlider.SelectIfInside(pos);
+        }
+
+        protected override void OnMouseUp(object sender, MouseButtonEventArgs e)
+        {
+            if (!Enabled)
+            {
+                return;
+            }
+            var pos = MainWindow.ScreenToCoord(e.X, e.Y, _window.Width, _window.Height);
+            _freqSlider.Unselect();
+        }
+
+        protected override void OnMouseMove(object sender, MouseMoveEventArgs e)
+        {
+            if (!Enabled)
+            {
+                return;
+            }
+            var pos = MainWindow.ScreenToCoord(e.X, e.Y, _window.Width, _window.Height);
+            _freqSlider.SlideIfSelected(pos);
         }
 
         protected override void OnKeyDown(object sender, KeyboardKeyEventArgs e)
@@ -205,11 +237,8 @@ namespace PhysicsSim.Scenes
             _circleL.Dispose();
             _circleR.Dispose();
             _ampLines.Dispose();
-            foreach (var button in _buttons.Values)
-            {
-                button.Dispose();
-            }
-            _buttons.Clear();
+            _startButton.Dispose();
+            _freqSlider.Dispose();
             GL.DeleteProgram(WaveProgram);
             GC.SuppressFinalize(this);
         }
