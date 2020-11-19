@@ -11,6 +11,7 @@ namespace Hanu.ElectroLib.Physics
 {
     public static class PLine
     {
+#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
         /// <summary>
         /// Calculate the electric field line asynchronously
         /// </summary>
@@ -22,6 +23,7 @@ namespace Hanu.ElectroLib.Physics
         /// <returns>the task that returns the list of points that represent the electric field line</returns>
         public async static Task<List<Vector2>> ElectricFieldLineAsync(IEnumerable<PhysicalObject> system, Vector2 initPos, Func<float, Vector2, bool> endFunc, bool startFromNegative, float delta = 1e-3f)
             => ElectricFieldLine(system, initPos, endFunc, startFromNegative, delta);
+#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
 
         /// <summary>
         /// Calculate the electric field line

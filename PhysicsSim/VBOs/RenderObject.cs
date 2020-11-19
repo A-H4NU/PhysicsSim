@@ -1,7 +1,7 @@
-﻿using PhysicsSim.Vertices;
-
-using OpenTK;
+﻿using OpenTK;
 using OpenTK.Graphics.OpenGL4;
+
+using PhysicsSim.Vertices;
 
 using System;
 

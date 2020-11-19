@@ -1,5 +1,6 @@
 ﻿using OpenTK;
 
+using System;
 using System.Collections.Generic;
 
 namespace PhysicsSim.VBOs
@@ -7,6 +8,13 @@ namespace PhysicsSim.VBOs
     public class ROCollection : ARenderable
     {
         private List<ARenderable> _rObj;
+
+        public ARenderable this[int index]
+        {
+            get => _rObj[index];
+        }
+
+        public int Count { get => _rObj.Count; }
 
         private ROCollection()
         {

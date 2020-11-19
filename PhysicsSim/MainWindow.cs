@@ -1,21 +1,14 @@
-﻿using PhysicsSim.Scenes;
-using PhysicsSim.VBOs;
-using PhysicsSim.Vertices;
-
-using Hanu.ElectroLib.Objects;
-using Hanu.ElectroLib.Physics;
-
-using OpenTK;
+﻿using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Input;
 
+using PhysicsSim.Scenes;
+using PhysicsSim.VBOs;
+
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Timers;
 
 namespace PhysicsSim
@@ -36,22 +29,21 @@ namespace PhysicsSim
 
         private readonly Timer _timer;
 
-        private BeatScene _es;
+        private Scene _es;
 
-        private TexturedRenderObject _tro;
+        private string _title;
 
         public MainWindow(int width, int height)
             : base(width, height, new GraphicsMode(32, 24, 0, 8), "PhysicsSim", GameWindowFlags.Default, DisplayDevice.Default)
         {
             // Create timer that perform a specific function
             _timer = new Timer(5000);
-            _timer.Elapsed += (o, e) =>
-            {
-                Console.WriteLine($"total memory using at {e.SignalTime:HH:mm:ss:fff}: {GC.GetTotalMemory(true)} bytes");
-            };
+            _timer.Elapsed += (o, e) => Console.WriteLine($"total memory using at {e.SignalTime:HH:mm:ss:fff}: {GC.GetTotalMemory(true)} bytes");
             _timer.Start();
 
-            _es = new BeatScene(this) { Enabled = true };
+            _es = new MenuScene(this) { Enabled = true };
+
+            _title = "PhysicsSim";
         }
 
         // Contains overrided methods from OpenTK to render
@@ -69,8 +61,6 @@ namespace PhysicsSim
             ColoredProgram = CreateProgram(ColoredVertexShaderPath, ColoredFragmentShaderPath);
             TexturedProgram = CreateProgram(TexturedVertexShaderPath, TexturedFragmentShaderPath);
 
-            _tro = new TexturedRenderObject(ObjectFactory.TexRectangle(900f, 900f), @"Textures\unnamed3.jpeg", TexturedProgram);
-
             // Fill each face no matter it is a front face or not
             GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Fill);
             GL.PatchParameter(PatchParameterInt.PatchVertices, 3);
@@ -81,6 +71,8 @@ namespace PhysicsSim
             GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
 
             GL.LineWidth(2f);
+
+            base.OnLoad(e);
         }
 
         /// <summary>
@@ -94,28 +86,21 @@ namespace PhysicsSim
             base.OnResize(e);
         }
 
-        
+
 
         public double Time { get; private set; } = 0.0;
         protected override void OnUpdateFrame(FrameEventArgs e)
         {
             Time += e.Time;
-            HandleKeyboard();
 
             base.OnUpdateFrame(e);
         }
 
         protected override void OnRenderFrame(FrameEventArgs e)
         {
+            Title = $"{_title} ({RenderFrequency:F0} FPS)";
+
             base.OnRenderFrame(e);
-
-            GL.Clear(ClearBufferMask.ColorBufferBit);
-
-            Matrix4 projection = Matrix4.CreateOrthographic(Width, Height, -1f, 1f);
-
-            //_tro.Render(ref projection);
-
-            //SwapBuffers();
         }
 
         /// <summary>
@@ -125,23 +110,8 @@ namespace PhysicsSim
         {
             // Forces an immediate garbage collection of all generations
             GC.Collect();
-        }
 
-        #endregion
-
-        // Contains overrided methods from OpenTK and others to handling inputs
-        #region Input Handling
-
-        /// <summary>
-        /// Handling keyboard input, called in every frame
-        /// </summary>
-        private void HandleKeyboard()
-        {
-            KeyboardState state = Keyboard.GetState();
-            if (state.IsKeyDown(Key.Escape))
-            {
-                Close();
-            }
+            base.OnClosed(e);
         }
 
         #endregion
@@ -153,7 +123,7 @@ namespace PhysicsSim
         /// Compiling a shader from the filepath
         /// </summary>
         /// <returns>The ID of the compiled shader</returns>
-        private int CompileShader(ShaderType type, string filepath)
+        private static int CompileShader(ShaderType type, string filepath)
         {
             int shader = GL.CreateShader(type);
             string source = File.ReadAllText(filepath);
@@ -172,7 +142,7 @@ namespace PhysicsSim
         /// Create a new program that contains <see cref="ShaderType.VertexShader"/> and <see cref="ShaderType.FragmentShader"/>
         /// </summary>
         /// <returns>The ID of the created program</returns>
-        private int CreateProgram(string vertexPath, string fragmentPath)
+        public static int CreateProgram(string vertexPath, string fragmentPath)
         {
             int program = GL.CreateProgram();
             List<int> shaders = new List<int>
@@ -202,5 +172,19 @@ namespace PhysicsSim
         }
 
         #endregion
+
+        /// <summary>
+        /// Get projection matrix for rendering, which is a orthographic projection matrix
+        /// </summary>
+        /// <returns>The orthographic matrix</returns>
+        public static Matrix4 GetProjection(float width, float height)
+            => Matrix4.CreateOrthographic(width, height, -1f, 1f);
+
+        /// <summary>
+        /// Convert input coordinate to system coordinate
+        /// </summary>
+        /// <returns>System coordinate</returns>
+        public static System.Numerics.Vector2 ScreenToCoord(int x, int y, float width, float height)
+            => new System.Numerics.Vector2(x - width / 2f, -y + height / 2f);
     }
 }

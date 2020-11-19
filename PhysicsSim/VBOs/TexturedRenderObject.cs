@@ -4,13 +4,8 @@ using OpenTK.Graphics.OpenGL4;
 using PhysicsSim.Vertices;
 
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PhysicsSim.VBOs
 {
@@ -67,7 +62,7 @@ namespace PhysicsSim.VBOs
 
             _texture = InitTexture(filename);
         }
-        
+
         public override void Render(ref Matrix4 projection, Vector3 translation, Vector3 rotation, Vector3 scale)
         {
             GL.UseProgram(_program);
@@ -83,8 +78,8 @@ namespace PhysicsSim.VBOs
         private int InitTexture(string filename)
         {
             GL.CreateTextures(TextureTarget.Texture2D, 1, out int texture);
-            var bitmap = (Bitmap)Image.FromFile(filename);
-            var data = bitmap.LockBits(
+            Bitmap bitmap = (Bitmap)Image.FromFile(filename);
+            BitmapData data = bitmap.LockBits(
                new Rectangle(0, 0, bitmap.Width, bitmap.Height),
                ImageLockMode.ReadOnly,
                System.Drawing.Imaging.PixelFormat.Format32bppArgb);
