@@ -99,5 +99,8 @@ namespace Hanu.ElectroLib.Physics
             d /= d.Length();
             return (pp1 - Vector2.Dot(pp1, d) * d).Length();
         }
+
+
+        
     }
 }
