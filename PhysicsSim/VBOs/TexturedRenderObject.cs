@@ -19,16 +19,52 @@ namespace PhysicsSim.VBOs
         private readonly PrimitiveType _renderType;
         private readonly int _texture;
 
+        private readonly bool _createdTexture;
+
         public TexturedRenderObject((TexturedVertex[] vertices, PrimitiveType renderType) tuple, string filename, int program)
         {
-            TexturedVertex[] vertices = tuple.vertices;
             _renderType = tuple.renderType;
-            _verticeCount = vertices.Length;
+            _verticeCount = tuple.vertices.Length;
             _program = program;
 
             _vertexArray = GL.GenVertexArray();
             _buffer = GL.GenBuffer();
 
+            InitVertexArrayBuffer(tuple.vertices);
+            _texture = InitTexture(filename);
+            _createdTexture = true;
+        }
+
+        public TexturedRenderObject((TexturedVertex[] vertices, PrimitiveType renderType) tuple, Bitmap bitmap, int program)
+        {
+            _renderType = tuple.renderType;
+            _verticeCount = tuple.vertices.Length;
+            _program = program;
+
+            _vertexArray = GL.GenVertexArray();
+            _buffer = GL.GenBuffer();
+
+            InitVertexArrayBuffer(tuple.vertices);
+            _texture = InitTexture(bitmap);
+            _createdTexture = true;
+        }
+
+        public TexturedRenderObject((TexturedVertex[] vertices, PrimitiveType renderType) tuple, int texture, int program)
+        {
+            _renderType = tuple.renderType;
+            _verticeCount = tuple.vertices.Length;
+            _program = program;
+
+            _vertexArray = GL.GenVertexArray();
+            _buffer = GL.GenBuffer();
+
+            InitVertexArrayBuffer(tuple.vertices);
+            _texture = texture;
+            _createdTexture = false;
+        }
+
+        private void InitVertexArrayBuffer(TexturedVertex[] vertices)
+        {
             GL.BindVertexArray(_vertexArray);
             GL.BindBuffer(BufferTarget.ArrayBuffer, _buffer);
 
@@ -59,8 +95,6 @@ namespace PhysicsSim.VBOs
                 16);
 
             GL.VertexArrayVertexBuffer(_vertexArray, 0, _buffer, IntPtr.Zero, TexturedVertex.SIZE);
-
-            _texture = InitTexture(filename);
         }
 
         public override void Render(ref Matrix4 projection, Vector3 translation, Vector3 rotation, Vector3 scale)
@@ -75,14 +109,19 @@ namespace PhysicsSim.VBOs
             GL.DrawArrays(_renderType, 0, _verticeCount);
         }
 
-        private int InitTexture(string filename)
+        public static int InitTexture(string filename)
+        {
+            Bitmap bitmap = (Bitmap)Image.FromFile(filename);
+            return InitTexture(bitmap);
+        }
+
+        public static int InitTexture(Bitmap bitmap)
         {
             GL.CreateTextures(TextureTarget.Texture2D, 1, out int texture);
-            Bitmap bitmap = (Bitmap)Image.FromFile(filename);
             BitmapData data = bitmap.LockBits(
-               new Rectangle(0, 0, bitmap.Width, bitmap.Height),
-               ImageLockMode.ReadOnly,
-               System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+                  new Rectangle(0, 0, bitmap.Width, bitmap.Height),
+                  ImageLockMode.ReadOnly,
+                  System.Drawing.Imaging.PixelFormat.Format32bppArgb);
             GL.BindTexture(TextureTarget.Texture2D, texture);
             GL.TexImage2D(
                 TextureTarget.Texture2D,
@@ -95,8 +134,8 @@ namespace PhysicsSim.VBOs
                 PixelType.UnsignedByte,
                 data.Scan0);
             bitmap.UnlockBits(data);
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest);
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Nearest);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
             return texture;
         }
 
@@ -106,6 +145,10 @@ namespace PhysicsSim.VBOs
             {
                 GL.DeleteVertexArray(_vertexArray);
                 GL.DeleteBuffer(_buffer);
+                if (_createdTexture)
+                {
+                    GL.DeleteTexture(_texture);
+                }
                 _initialized = false;
             }
         }

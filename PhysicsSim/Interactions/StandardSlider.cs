@@ -100,8 +100,7 @@ namespace PhysicsSim.Interactions
         {
             get
             {
-                float t = (_value - _min) / (_max - _min);
-                return new RectangleF(Position.X - _width / 2f + (_width - _sliderW) * t, Position.Y -_height / 2f, _sliderW, _height);
+                return new RectangleF(Position.X - _width / 2f, Position.Y - _height / 2f, _width, _height);
             }
         }
 
@@ -154,7 +153,7 @@ namespace PhysicsSim.Interactions
 
         public bool SlideIfSelected(System.Numerics.Vector2 pos)
         {
-            if (IsInside(pos) && Selected)
+            if (Selected)
             {
                 float t = (pos.X - (Position.X - _width / 2f + _sliderW / 2f)) / (_width - _sliderW);
                 t = t < 0 ? 0 : (t > 1 ? 1 : t);

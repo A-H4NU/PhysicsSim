@@ -4,6 +4,7 @@ using OpenTK.Graphics.OpenGL4;
 using OpenTK.Input;
 
 using PhysicsSim.Interactions;
+using PhysicsSim.VBOs;
 
 using System;
 using System.Collections.Generic;
@@ -49,10 +50,13 @@ namespace PhysicsSim.Scenes
                 new TexturedButton(500f, 500f, 5f, border, @"Textures\beat_wave.jpg", _window.ColoredProgram, _window.TexturedProgram)
             });
             for (int i = 0; i < _buttons.Count; ++i)
-            {;
+            {
                 int idx = i;
                 _buttons[i].ButtonPressEvent += (o, _) => ActivateScene(idx + 1);
             }
+
+            GL.Enable(EnableCap.Blend);
+
             RearrangeButtons();
         }
 
