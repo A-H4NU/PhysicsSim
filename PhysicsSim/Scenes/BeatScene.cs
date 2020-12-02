@@ -24,15 +24,24 @@ namespace PhysicsSim.Scenes
 
         public static float Wavelength;
 
-        public static float time = 0f, speed = 0.00001f;
+        public static float time = 0f, speed = 400f;
 
         private ARenderable _line;
 
         private readonly Dictionary<string, RectangularButton> _buttons;
 
         private static bool _working1 = false;
-        private static float _time1 = 100000f, _time2 = 100000f;
+        public static List<float> timelist1 = new List<float>();
+        public static List<float> timelist2 = new List<float>();
+
         private static bool _working2 = false;
+
+        private static float Sooth(float x)
+        {
+            x = Math.Abs(x);
+            double a = 2 - 2 / (1 + Math.Pow(Math.E, -1/Math.Sqrt(x)));
+            return (float)(a*a);
+        }
 
         public static List<System.Numerics.Vector2> WaveLine(float Amp,
                                              float speed,
@@ -44,39 +53,52 @@ namespace PhysicsSim.Scenes
         {
             List<System.Numerics.Vector2> vectorArrays = new List<System.Numerics.Vector2>();
             System.Numerics.Vector2 i = new System.Numerics.Vector2(-windowwidth / 2, 0);
-            float count = 0;
-            float flag;
+            float x = 0;
+
+            float wavenumber1 = 2 * MathHelper.Pi / speed * frequency_1;
+            float angularFrequency1 = 2 * MathHelper.Pi * frequency_1;
+            float wavenumber2 = 2 * MathHelper.Pi / speed * frequency_2;
+            float angularFrequency2 = 2 * MathHelper.Pi * frequency_2;
+
             while (vectorArrays.Count == 0 || vectorArrays.Last().X <= windowwidth / 2)
             {
                 double temp = 0f;
-                if (BeatScene._working1)
+                for (int n = 0; n< (int)(timelist1.Count / 2); n++)
                 {
-                    if (_time1 * speed * 500 + 800 < count)
+                    if (x >= (time - timelist1[2*n+1]) * speed && x <= (time - timelist1[2*n]) * speed)
                     {
-                        flag = 0;
+                        float starttime1 = timelist1[2*n];
+                        float para1 = angularFrequency1 * (time - starttime1) - wavenumber1 * x;
+                        temp += Amp * Sooth(para1) * Math.Sin(para1);
+                        break;
                     }
-                    else
-                    {
-                        flag = 1;
-                    }
-                    temp += flag * Amp * Math.Sin(-2 * Math.PI * frequency_1 / speed * count + 2 * Math.PI * frequency_1 * time);
                 }
-                if (BeatScene._working2)
+                if (timelist1.Count % 2 == 1 && x <= (time - timelist1.Last()) * speed)
                 {
-                    if (_time2 * speed * 500 + 800 < count)
-                    {
-                        flag = 0;
-                    }
-                    else
-                    {
-                        flag = 1;
-                    }
-                    temp -= flag * (Amp) * Math.Sin(-2 * Math.PI * frequency_2 / speed * count + 2 * Math.PI * frequency_2 * time);
+                    float starttime1 = timelist1.Last();
+                    float para1 = angularFrequency1 * (time - starttime1) - wavenumber1 * x;
+                    temp += Amp * Sooth(para1) * Math.Sin(para1);
                 }
-                i.X = count - windowwidth;
+
+                for (int n = 0; n< (int)(timelist2.Count / 2); n++)
+                {
+                    if (x >= (time - timelist2[2*n+1]) * speed && x <= (time - timelist2[2*n]) * speed)
+                    {
+                        float starttime2 = timelist2[2*n];
+                        temp += Amp * Math.Sin(angularFrequency2 * (time - starttime2) - wavenumber2 * x);
+                        break;
+                    }
+                }
+                if (timelist2.Count % 2 == 1 && x <= (time - timelist2.Last()) * speed)
+                {
+                    float starttime2 = timelist2.Last();
+                    temp += Amp * Math.Sin(angularFrequency2 * (time - starttime2) - wavenumber2 * x);
+                }
+
+                i.X = x - windowwidth/2 ;
                 i.Y = (float)temp;
                 vectorArrays.Add(i);
-                count += delta;
+                x += delta;
             }
             return vectorArrays;
         }
@@ -131,7 +153,8 @@ namespace PhysicsSim.Scenes
             _buttons["start1"].ButtonPressEvent += (o, a) =>
             {
                 _working1 ^= true;
-                _time1 = 0f;
+                //_time1 = 0f;
+                timelist1.Add(time);
                 _buttons["start1"].FillColor = _working1 ? Color4.Red : Color4.Gray;
             };
 
@@ -146,7 +169,8 @@ namespace PhysicsSim.Scenes
             _buttons["start2"].ButtonPressEvent += (o, a) =>
             {
                 _working2 ^= true;
-                _time2 = 0f;
+                //_time2 = 0f;
+                timelist2.Add(time);
                 _buttons["start2"].FillColor = _working2 ? Color4.Red : Color4.Gray;
             };
             ///////////////////
@@ -157,7 +181,6 @@ namespace PhysicsSim.Scenes
             if (!Enabled) return;
             // Clear the used buffer to paint a new frame onto it
             GL.Clear(ClearBufferMask.ColorBufferBit);
-            Console.WriteLine(_window.Width);
             // Declare that we will use this program
             //GL.UseProgram(_window.ColoredProgram);
             // Get projection matrix and make shaders to compute with this matrix
@@ -193,14 +216,13 @@ namespace PhysicsSim.Scenes
         {
             if (!Enabled) return;
             time += (float)e.Time;
-            time %= 10f;
             if (_working1)
             {
-                _time1 += 1000f;
+                //_time1 += (float)e.Time;
             }
             if (_working2)
             {
-                _time2 += 1000f;
+                //_time2 += (float)e.Time;
             }
             _line = new RenderObject(ObjectFactory.Curve(WaveLine(100f, speed, 6f, 7f , _window.Width, time), Color4.WhiteSmoke), _window.ColoredProgram);
         }
