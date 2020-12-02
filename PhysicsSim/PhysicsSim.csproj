@@ -13,6 +13,8 @@
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
     <TargetFrameworkProfile />
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -78,6 +80,7 @@
     <Compile Include="Interactions\IButton.cs" />
     <Compile Include="VBOs\ARenderable.cs" />
     <Compile Include="VBOs\RenderObject.cs" />
+    <Compile Include="VBOs\RenderText.cs" />
     <Compile Include="VBOs\ROCollection.cs" />
     <Compile Include="VBOs\RPhysicalObject.cs" />
     <Compile Include="VBOs\TexturedRenderObject.cs" />

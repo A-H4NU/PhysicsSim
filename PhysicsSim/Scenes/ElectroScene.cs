@@ -29,7 +29,7 @@ namespace PhysicsSim.Scenes
         /// </summary>
         public static float MaxT = 5f;
 
-        public static int LinePerUnitCharge = 32;
+        public static int LinePerUnitCharge = 12;
 
         public static float UnitCharge = 1e-6f;
 
@@ -113,13 +113,19 @@ namespace PhysicsSim.Scenes
                 _pObjs.Add(new RPhysicalObject(obj, _window.ColoredProgram));
                 Console.WriteLine($"Added object at {pos}");
             }
-            if (e.Button == MouseButton.Right)
+        }
+
+        protected override void OnMouseMove(object sender, MouseMoveEventArgs e)
+        {
+            if (!Enabled)
             {
-                if (_pObjs.Count != 0)
-                {
-                    System.Numerics.Vector2 ef = PSystem.GetElectricFieldAt(_pObjs.Extracted(), pos);
-                    Console.WriteLine($"Electric field at {pos,15}: {ef.Length(),9:F2} N/C, {Math.Atan2(ef.Y, ef.X) * 180 / Math.PI,7:F2}°");
-                }
+                return;
+            }
+
+            System.Numerics.Vector2 pos = MainWindow.ScreenToCoord(e.X, e.Y, _window.Width, _window.Height) / Scale;
+            if (e.Mouse.IsButtonDown(MouseButton.Left))
+            {
+                Console.WriteLine("drag");
             }
         }
 
@@ -136,7 +142,7 @@ namespace PhysicsSim.Scenes
             }
         }
 
-        protected override async void OnKeyDown(object sender, KeyboardKeyEventArgs e)
+        protected override void OnKeyDown(object sender, KeyboardKeyEventArgs e)
         {
             if (!Enabled)
             {
@@ -156,77 +162,83 @@ namespace PhysicsSim.Scenes
             }
             if (e.Key == Key.F && true || !e.IsRepeat)
             {
-                // If _pObjs contains any object whose charge is not zero
-                if (_pObjs.Any((p) => p.PObject.Charge != 0f))
-                {
-                    // Initialize stopwatch to measure time comsumed
-                    Stopwatch stopwatch = new Stopwatch();
-                    stopwatch.Start();
-
-                    // Dispose elements in _lines and clear it
-                    foreach (ARenderable line in _lines)
-                    {
-                        line.Dispose();
-                    }
-                    _lines.Clear();
-
-                    // get the number of lines needed
-                    int linecount = 0;
-                    foreach (RPhysicalObject obj in _pObjs)
-                    {
-                        if (obj.PObject.Charge <= 0)
-                        {
-                            continue;
-                        }
-
-                        linecount += (int)(obj.PObject.Charge / UnitCharge) * LinePerUnitCharge;
-                    }
-
-                    List<Task<List<System.Numerics.Vector2>>> taskList = new List<Task<List<System.Numerics.Vector2>>>(linecount);
-                    foreach (RPhysicalObject obj in _pObjs)
-                    {
-                        if (obj.PObject.Charge < 0)
-                        {
-                            continue;
-                        }
-
-                        int units = (int)(obj.PObject.Charge / UnitCharge);
-                        for (int i = 0; i < units * LinePerUnitCharge; ++i)
-                        {
-                            double angle = 2*i*Math.PI / (units*LinePerUnitCharge);
-                            // relative displacement with respect to the position of the charge
-                            System.Numerics.Vector2 delta = new System.Numerics.Vector2(
-                                (float)Math.Cos(angle), (float)Math.Sin(angle)) * RPhysicalObject.Radius / Scale;
-                            // create new task that calculates an electric field line from the specified starting point
-                            Task<List<System.Numerics.Vector2>> task = PLine.ElectricFieldLineAsync(
-                                system: _pObjs.Extracted(),             // list of physical objects
-                                initPos: obj.PObject.Position + delta,  // starting point of the line
-                                endFunc: (t, v)                         // ending function (calculation stops if true)
-                                    => t > MaxT ||
-                                    !(-_window.Width / Scale < v.X && v.X < _window.Width / Scale && -_window.Height / Scale < v.Y && v.Y < _window.Height / Scale),
-                                startFromNegative: false);              // is starting from negative charge
-                            taskList.Add(task);
-                        }
-                    }
-                    while (taskList.Any())
-                    {
-                        // await the next task which is finished
-                        Task<List<System.Numerics.Vector2>> finished = await Task.WhenAny(taskList);
-                        // remove the finished task from the list
-                        taskList.Remove(finished);
-                        // get the result from the finished task
-                        List<System.Numerics.Vector2> result = await finished;
-                        // add the line to _lines list
-                        _lines.Add(new RenderObject(ObjectFactory.Curve(result, Color4.White), _window.ColoredProgram) { Scale = new Vector3(Scale, Scale, 1) });
-                    }
-                    // stop the stopwatch and write how much time is elapsed
-                    stopwatch.Stop();
-                    Console.WriteLine($"Time elapsed: {stopwatch.Elapsed.TotalMilliseconds:F2} ms; {_lines.Count} lines");
-                }
+                DrawElectricLines();
             }
         }
 
         #endregion
+
+        private async void DrawElectricLines()
+        {
+            // If _pObjs contains any object whose charge is not zero
+            if (_pObjs.Any((p) => p.PObject.Charge != 0f))
+            {
+                // Initialize stopwatch to measure time comsumed
+                Stopwatch stopwatch = new Stopwatch();
+                stopwatch.Start();
+
+                // Dispose elements in _lines and clear it
+                foreach (ARenderable line in _lines)
+                {
+                    line.Dispose();
+                }
+                _lines.Clear();
+
+                // get the number of lines needed
+                int linecount = 0;
+                foreach (RPhysicalObject obj in _pObjs)
+                {
+                    if (obj.PObject.Charge <= 0)
+                    {
+                        continue;
+                    }
+
+                    linecount += (int)(obj.PObject.Charge / UnitCharge) * LinePerUnitCharge;
+                }
+
+                List<Task<List<System.Numerics.Vector2>>> taskList = new List<Task<List<System.Numerics.Vector2>>>(linecount);
+                foreach (RPhysicalObject obj in _pObjs)
+                {
+                    if (obj.PObject.Charge < 0)
+                    {
+                        continue;
+                    }
+
+                    int units = (int)(obj.PObject.Charge / UnitCharge);
+                    for (int i = 0; i < units * LinePerUnitCharge; ++i)
+                    {
+                        double angle = 2*i*Math.PI / (units*LinePerUnitCharge);
+                        // relative displacement with respect to the position of the charge
+                        System.Numerics.Vector2 delta = new System.Numerics.Vector2(
+                            (float)Math.Cos(angle), (float)Math.Sin(angle)) * RPhysicalObject.Radius / Scale;
+                        // create new task that calculates an electric field line from the specified starting point
+                        Task<List<System.Numerics.Vector2>> task = PLine.ElectricFieldLineAsync(
+                            system: _pObjs.Extracted(),             // list of physical objects
+                            initPos: obj.PObject.Position + delta,  // starting point of the line
+                            endFunc: (t, v)                         // ending function (calculation stops if true)
+                                => t > MaxT ||
+                                !(-_window.Width / Scale < v.X && v.X < _window.Width / Scale && -_window.Height / Scale < v.Y && v.Y < _window.Height / Scale),
+                            startFromNegative: false,               // is starting from negative charge
+                            delta: 2e-3f);
+                        taskList.Add(task);
+                    }
+                }
+                while (taskList.Any())
+                {
+                    // await the next task which is finished
+                    Task<List<System.Numerics.Vector2>> finished = await Task.WhenAny(taskList);
+                    // remove the finished task from the list
+                    taskList.Remove(finished);
+                    // get the result from the finished task
+                    List<System.Numerics.Vector2> result = await finished;
+                    // add the line to _lines list
+                    _lines.Add(new RenderObject(ObjectFactory.Curve(result, Color4.White), _window.ColoredProgram) { Scale = new Vector3(Scale, Scale, 1) });
+                }
+                // stop the stopwatch and write how much time is elapsed
+                stopwatch.Stop();
+                Console.WriteLine($"Time elapsed: {stopwatch.Elapsed.TotalMilliseconds:F2} ms; {_lines.Count} lines");
+            }
+        }
 
         public override void Dispose()
         {

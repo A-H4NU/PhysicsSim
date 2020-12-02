@@ -111,7 +111,7 @@ namespace PhysicsSim.Scenes
 
         public override void Dispose()
         {
-            _line.Dispose();
+            _line?.Dispose();
             foreach (var button in _buttons.Values)
             {
                 button.Dispose();

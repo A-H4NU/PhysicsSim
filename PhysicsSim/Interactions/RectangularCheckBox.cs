@@ -99,7 +99,6 @@ namespace PhysicsSim.Interactions
         {
             IsChecked ^= true;
             _render[_render.Count - 1].Enabled = IsChecked;
-            Console.WriteLine(_render[_render.Count - 1].Enabled);
             CheckBoxToggleEvent?.Invoke(this, new EventArgs());
         }
 
@@ -115,7 +114,7 @@ namespace PhysicsSim.Interactions
             if (_lineColor != null)
             {
                 renders.Add(new RenderObject(
-                    ObjectFactory.RectangleEdge(_width, _height, _lineWidth, _lineColor.Value, ObjectFactory.BorderType.Inner),
+                    ObjectFactory.RectangleEdge(_width, _height, _lineWidth, _lineColor.Value, ObjectFactory.BorderType.Middle),
                     _program));
             }
             renders.Add(new RenderObject(ObjectFactory.CheckMark(_width, _height, _checkColor), _program) { Enabled = IsChecked });
