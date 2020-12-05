@@ -7,13 +7,13 @@ namespace PhysicsSim.Vertices
     {
         public const int SIZE = 32;
 
-        private readonly Vector4 _position;
-        private readonly Color4 _color;
+        public readonly Vector4 Position;
+        public readonly Color4 Color;
 
         public ColoredVertex(Vector4 position, Color4 color)
         {
-            _position = position;
-            _color = color;
+            Position = position;
+            Color = color;
         }
     }
 }
