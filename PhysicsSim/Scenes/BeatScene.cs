@@ -21,22 +21,22 @@ namespace PhysicsSim.Scenes
         public float freq1,freq2;
 
         public static float Amplitude;
-
+        public static float screentime = 0f;
         public static float Wavelength;
 
-        public static float time = 0f, speed = 400f;
+        public static float time = 0f, speed = 500f;
 
         private ARenderable _line;
 
         private readonly Dictionary<string, RectangularButton> _buttons;
-        private StandardSlider _freq1Slider, _freq2Slider;
-        private RenderText freq1Text, freq2Text;
+        private StandardSlider _freq1Slider, _freq2Slider, _timeSlider;
+        private RenderText freq1Text, freq2Text, ScreenTimeText;
         private static bool _working1 = false;
         public static List<float> timelist1 = new List<float>();
         public static List<float> timelist2 = new List<float>();
 
         private static bool _working2 = false;
-        private string fontName;
+        private string fontName = "Arial";
 
         private static float Sooth(float x)
         {
@@ -72,7 +72,9 @@ namespace PhysicsSim.Scenes
                     {
                         float starttime1 = timelist1[2*n];
                         float para1 = angularFrequency1 * (time - starttime1) - wavenumber1 * x;
-                        temp += Amp * Sooth(para1) * Math.Sin(para1);
+                        float endtime1 = timelist1[2*n+1];
+                        float para1rev = angularFrequency1 * (endtime1-time) + wavenumber1 * x;
+                        temp += Amp * Sooth(para1rev) * Sooth(para1) * Math.Sin(para1);
                         break;
                     }
                 }
@@ -125,6 +127,9 @@ namespace PhysicsSim.Scenes
                 button.Dispose();
             }
             _buttons.Clear();
+            _freq1Slider.Dispose();
+            _freq2Slider.Dispose();
+            _timeSlider.Dispose();
             GC.SuppressFinalize(this);
         }
 
@@ -132,6 +137,25 @@ namespace PhysicsSim.Scenes
         {
             _buttons["start1"].Area = new RectangleF(_window.Width / 2f - 75f, -_window.Height / 2f + 15f, 60f, 60f);
             _buttons["start2"].Area = new RectangleF(_window.Width / 2f - 145f, -_window.Height / 2f + 15f, 60f, 60f);
+            _buttons["startboth"].Area = new RectangleF(_window.Width / 2f - 215f, -_window.Height / 2f + 15f, 60f, 60f);
+            _freq1Slider.Position = new Vector3(
+                -Window.Width / 2f + _freq1Slider.Width / 2f + 15f,
+                -Window.Height / 2f + _freq1Slider.Height / 2f + 15f, 0f);
+            _freq2Slider.Position = new Vector3(
+                -Window.Width / 2f + _freq2Slider.Width / 2f + 15f,
+                -Window.Height / 2f + _freq1Slider.Height + _freq2Slider.Height / 2f + 30f, 0f);
+            _timeSlider.Position = new Vector3(
+                -Window.Width / 2f + _timeSlider.Width / 2f + 15f,
+                +Window.Height / 2f - _freq2Slider.Height / 2f - 15f, 0f);
+            freq1Text.Position = new Vector3(
+                -Window.Width / 2f + _freq1Slider.Width + freq1Text.Width / 2f + 45f,
+                -Window.Height / 2f + _freq1Slider.Height / 2f + 15f, 0f);
+            freq2Text.Position = new Vector3(
+                -Window.Width / 2f + _freq2Slider.Width + freq2Text.Width / 2f + 45f,
+                -Window.Height / 2f + _freq1Slider.Height + _freq2Slider.Height / 2f + 30f, 0f);
+            ScreenTimeText.Position = new Vector3(
+                -Window.Width / 2f + _timeSlider.Width + 45f + ScreenTimeText.Width / 2f,
+                +Window.Height / 2f - _freq2Slider.Height / 2f - 15f, 0f);
         }
 
         protected override void OnClosed(object sender, EventArgs e)
@@ -163,12 +187,12 @@ namespace PhysicsSim.Scenes
                 if (timelist1.Count() == 0)
                 {
                     timelist1.Add(time);
-                    timelist1.Add(time + 3f);
+                    timelist1.Add(time + screentime);
                 }
                 if (time > timelist1.Last())
                 {
                     timelist1.Add(time);
-                    timelist1.Add(time + 3f);
+                    timelist1.Add(time + screentime);
                 }
                 _buttons["start1"].FillColor = _working1 ? Color4.Red : Color4.Gray;
             };
@@ -186,35 +210,65 @@ namespace PhysicsSim.Scenes
                 if(timelist2.Count() == 0)
                 {
                     timelist2.Add(time);
-                    timelist2.Add(time + 3f);
+                    timelist2.Add(time + screentime);
                 }
                 if(time > timelist2.Last())
                 {
                     timelist2.Add(time);
-                    timelist2.Add(time + 3f);
+                    timelist2.Add(time + screentime);
                 }
                 
                 _buttons["start2"].FillColor = _working2 ? Color4.Red : Color4.Gray;
             };
+
+            _buttons.Add(
+                "startboth",
+                new RectangularButton(
+                    new RectangleF(_window.Width / 2f - 215f, -_window.Height / 2f + 15f, 60f, 60f),
+                    ARectangularInteraction.DefaultLineWidth,
+                    Color4.BlueViolet,
+                    Color4.White,
+                    _window.ColoredProgram));
+            _buttons["startboth"].ButtonPressEvent += (o, a) =>
+            {
+                if (timelist1.Count() == 0 || timelist2.Count() == 0)
+                {
+                    _buttons["start1"].Press();
+                    _buttons["start2"].Press();
+                }
+                if (time > timelist1.Last() && time > timelist2.Last())
+                {
+                    _buttons["start1"].Press();
+                    _buttons["start2"].Press();
+                }
+                
+            };
             ///////////////////
             ///
-            _freq1Slider = new StandardSlider(400, 50, 20, 0, 5f, Color4.LightBlue, Color4.White, _window.ColoredProgram);
+            _freq1Slider = new StandardSlider(400, 50, 20, 0, 15f, Color4.LightBlue, Color4.White, _window.ColoredProgram);
             _freq1Slider.ValueChangedEvent += (o, ev) =>
             {
                 freq1 = ev.NewValue;
-                freq1Text.Text = $"f1={ev.NewValue:0.000} Hz";
-                
+                freq1Text.Text = $"f1={ev.NewValue:0.00} Hz";
             };
-            _freq2Slider = new StandardSlider(400, 50, 20, 0, 200, Color4.LightBlue, Color.White, _window.ColoredProgram) { Value = 100f };
+
+            _freq2Slider = new StandardSlider(400, 50, 20, 0, 15f, Color4.LightBlue, Color.White, _window.ColoredProgram);
             _freq2Slider.ValueChangedEvent += (o, ev) =>
             {
                 freq2 = ev.NewValue;
-                freq2Text.Text = $"f2={ev.NewValue:000.00} Hz";
-                
+                freq2Text.Text = $"f2={ev.NewValue:0.00} Hz";
             };
 
-            freq1Text = new RenderText(25, fontName, "f=0.000 Hz", Color.Transparent, Color.White, _window.TexturedProgram);
-            freq2Text = new RenderText(25, fontName, "f=0.000 Hz", Color.Transparent, Color.White, _window.TexturedProgram);
+            _timeSlider = new StandardSlider(400, 50, 20, 0, 20f, Color4.LightBlue, Color.White, _window.ColoredProgram);
+            _timeSlider.ValueChangedEvent += (o, ev) =>
+            {
+                screentime = ev.NewValue;
+                ScreenTimeText.Text = $"ScreenTime={ev.NewValue:0} ";
+            };
+
+            freq1Text = new RenderText(25, fontName, "f1=0.00 Hz", Color.Transparent, Color.White, _window.TexturedProgram);
+            freq2Text = new RenderText(25, fontName, "f2=0.00 Hz", Color.Transparent, Color.White, _window.TexturedProgram);
+            ScreenTimeText = new RenderText(25, fontName, "ScreenTime=0 ", Color.Transparent, Color.White, _window.TexturedProgram);
         }
 
         protected override void OnRenderFrame(object sender, FrameEventArgs e)
@@ -228,7 +282,12 @@ namespace PhysicsSim.Scenes
             Matrix4 projection = GetProjection();
 
             _line?.Render(ref projection);
-
+            _freq1Slider.Render(ref projection);
+            _freq2Slider.Render(ref projection);
+            _timeSlider.Render(ref projection);
+            freq1Text.Render(ref projection);
+            freq2Text.Render(ref projection);
+            ScreenTimeText.Render(ref projection);
             foreach (var button in _buttons.Values)
             {
                 button.Render(ref projection);
@@ -246,6 +305,51 @@ namespace PhysicsSim.Scenes
             var pos = MainWindow.ScreenToCoord(e.X, e.Y, _window.Width, _window.Height);
             _buttons["start1"].PressIfInside(pos);
             _buttons["start2"].PressIfInside(pos);
+            _buttons["startboth"].PressIfInside(pos);
+            if (_freq1Slider.SelectIfInside(pos))
+            {
+                _freq1Slider.SlideIfSelected(pos);
+            }
+            if (_freq2Slider.SelectIfInside(pos))
+            {
+                _freq2Slider.SlideIfSelected(pos);
+            }
+            if (_timeSlider.SelectIfInside(pos))
+            {
+                _timeSlider.SlideIfSelected(pos);
+            }
+        }
+
+        protected override void OnMouseUp(object sender, MouseButtonEventArgs e)
+        {
+            if (!Enabled)
+            {
+                return;
+            }
+            var pos = MainWindow.ScreenToCoord(e.X, e.Y, Window.Width, Window.Height);
+            _freq1Slider.Unselect();
+            _freq2Slider.Unselect();
+            _timeSlider.Unselect();
+        }
+
+        protected override void OnMouseMove(object sender, MouseMoveEventArgs e)
+        {
+            if (!Enabled)
+            {
+                return;
+            }
+            var pos = MainWindow.ScreenToCoord(e.X, e.Y, Window.Width, Window.Height);
+            _freq1Slider.SlideIfSelected(pos);
+            _freq2Slider.SlideIfSelected(pos);
+            _timeSlider.SlideIfSelected(pos);
+        }
+
+        protected override void OnKeyDown(object sender, KeyboardKeyEventArgs e)
+        {
+            if (!Enabled)
+            {
+                return;
+            }
         }
 
         private Matrix4 GetProjection()
@@ -281,6 +385,15 @@ namespace PhysicsSim.Scenes
                     _working1 = false;
                 }
                 _buttons["start1"].FillColor = _working1 ? Color4.Red : Color4.Gray;
+            }
+            
+            if(_working1 || _working2)
+            {
+                _buttons["startboth"].FillColor = Color4.SkyBlue;
+            }
+            else
+            {
+                _buttons["startboth"].FillColor = Color4.BlueViolet;
             }
             _line = new RenderObject(ObjectFactory.Curve(WaveLine(100f, speed, freq1, freq2 , _window.Width, time), Color4.WhiteSmoke), _window.ColoredProgram);
         }
