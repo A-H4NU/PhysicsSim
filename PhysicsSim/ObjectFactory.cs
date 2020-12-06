@@ -13,6 +13,11 @@ namespace PhysicsSim
 {
     public static class ObjectFactory
     {
+        public enum BorderType
+        {
+            Inner, Middle, Outter
+        }
+
         public static (ColoredVertex[], PrimitiveType) FilledCircle(
             float radius,
             Color4 color,
@@ -28,11 +33,6 @@ namespace PhysicsSim
                         radius * (float)Math.Sin(2*i*Math.PI / precision), 0, 1), color);
             }
             return (result, PrimitiveType.TriangleFan);
-        }
-
-        public enum BorderType
-        {
-            Inner, Middle, Outter
         }
 
         public static (ColoredVertex[], PrimitiveType) HollowCircle(
@@ -73,6 +73,23 @@ namespace PhysicsSim
                         inrad * (float)Math.Sin(2*i*Math.PI / precision), 0, 1), color);
             }
             return (result, PrimitiveType.TriangleStrip);
+        }
+
+        public static (ColoredVertex[], PrimitiveType) LineCircle(
+            float radius,
+            Color4 color,
+            int precision = 30)
+        {
+            var res = new ColoredVertex[precision];
+            for (int i = 0; i < precision; ++i)
+            {
+                float angle = MathHelper.TwoPi * i / precision;
+                res[i] =
+                    new ColoredVertex(
+                        new Vector4(radius * (float)Math.Cos(angle), radius * (float)Math.Sin(angle), 0f, 1f),
+                        color);
+            }
+            return (res, PrimitiveType.LineLoop);
         }
 
         public static (ColoredVertex[], PrimitiveType) Rectangle(
@@ -204,6 +221,27 @@ namespace PhysicsSim
                 new TexturedVertex(new Vector4(-width, -height, 0f, 1f), new Vector2(region.Left, region.Bottom))
             };
             return (res, PrimitiveType.Triangles);
+        }
+
+        /// <param name="angle">in radians</param>
+        public static (ColoredVertex[], PrimitiveType) Arrow(
+            float stem,
+            float leaves,
+            float angle,
+            Color4 color)
+        {
+            float leafX = -leaves * (float)Math.Cos(angle);
+            float leafY = leaves * (float)Math.Sin(angle);
+            var res = new ColoredVertex[]
+            {
+                new ColoredVertex(new Vector4(0f, 0f, 0f, 1f), color),
+                new ColoredVertex(new Vector4(stem, 0f, 0f, 1f), color),
+                new ColoredVertex(new Vector4(stem, 0f, 0f, 1f), color),
+                new ColoredVertex(new Vector4(stem + leafX, leafY, 0f, 1f), color),
+                new ColoredVertex(new Vector4(stem, 0f, 0f, 1f), color),
+                new ColoredVertex(new Vector4(stem + leafX, -leafY, 0f, 1f), color),
+            };
+            return (res, PrimitiveType.Lines);
         }
     }
 }

@@ -27,9 +27,10 @@ namespace PhysicsSim.Scenes
             _scenes = new List<Scene>()
             {
                 this,
-                new ElectroScene(_window),
-                new SWScene(_window),
-                new BeatScene(_window)
+                new ElectroScene(Window),
+                new SWScene(Window),
+                new BeatScene(Window),
+                new DopplerScene(Window),
             };
         }
 
@@ -45,16 +46,17 @@ namespace PhysicsSim.Scenes
             Color4 border = new Color4(0x50, 0xB0, 0xB2, 0xFF);
             _buttons.AddRange(new TexturedButton[]
             {
-                new TexturedButton(500f, 500f, 5f, border, @"Textures\electro.jpg", _window.ColoredProgram, _window.TexturedProgram),
-                new TexturedButton(500f, 500f, 5f, border, @"Textures\standing_wave.jpg", _window.ColoredProgram, _window.TexturedProgram),
-                new TexturedButton(500f, 500f, 5f, border, @"Textures\beat_wave.jpg", _window.ColoredProgram, _window.TexturedProgram)
+                new TexturedButton(500f, 500f, 5f, border, @"Textures\electro.jpg", Window.ColoredProgram, Window.TexturedProgram),
+                new TexturedButton(500f, 500f, 5f, border, @"Textures\standing_wave.jpg", Window.ColoredProgram, Window.TexturedProgram),
+                new TexturedButton(500f, 500f, 5f, border, @"Textures\beat_wave.jpg", Window.ColoredProgram, Window.TexturedProgram),
+                new TexturedButton(500f, 500f, 5f, border, @"Textures\doppler.jpg", Window.ColoredProgram, Window.TexturedProgram),
             });
             for (int i = 0; i < _buttons.Count; ++i)
             {
                 int idx = i;
                 _buttons[i].ButtonPressEvent += (o, _) => ActivateScene(idx + 1);
             }
-
+            ActivateScene(0);
             GL.Enable(EnableCap.Blend);
 
             RearrangeButtons();
@@ -73,9 +75,9 @@ namespace PhysicsSim.Scenes
         private void RearrangeButtons()
         {
             int gridW = 2, gridH = 2;
-            float tileside = (float)_window.Width / _window.Height < 1.5f ?
-                _window.Width / gridW :
-                _window.Height / gridH;
+            float tileside = (float)Window.Width / Window.Height < 1.5f ?
+                Window.Width / gridW :
+                Window.Height / gridH;
             tileside *= 0.95f;
             for (int i = 0; i < Math.Min(_buttons.Count, gridW * gridH); ++i)
             {
@@ -101,13 +103,13 @@ namespace PhysicsSim.Scenes
             {
                 GL.Clear(ClearBufferMask.ColorBufferBit);
 
-                Matrix4 projection = MainWindow.GetProjection(_window.Width, _window.Height);
+                Matrix4 projection = MainWindow.GetProjection(Window.Width, Window.Height);
                 foreach (var button in _buttons)
                 {
                     button.Render(ref projection);
                 }
 
-                _window.SwapBuffers();
+                Window.SwapBuffers();
             }
         }
 
@@ -115,7 +117,7 @@ namespace PhysicsSim.Scenes
         {
             if (Enabled)
             {
-                var pos = MainWindow.ScreenToCoord(e.X, e.Y, _window.Width, _window.Height);
+                var pos = MainWindow.ScreenToCoord(e.X, e.Y, Window.Width, Window.Height);
                 foreach (var button in _buttons)
                 {
                     button.PressIfInside(pos);
@@ -129,12 +131,23 @@ namespace PhysicsSim.Scenes
             {
                 if (_scenes[0].Enabled)
                 {
-                    _window.Close();
+                    Window.Close();
                 }
                 else
                 {
                     ActivateScene(0);
                     RearrangeButtons();
+                }
+            }
+            if (e.Key == Key.F11 && !e.IsRepeat)
+            {
+                if (Window.WindowState == WindowState.Fullscreen)
+                {
+                    Window.WindowState = WindowState.Normal;
+                }
+                else
+                {
+                    Window.WindowState = WindowState.Fullscreen;
                 }
             }
         }

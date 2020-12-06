@@ -89,7 +89,7 @@ namespace PhysicsSim.VBOs
                 * Matrix4.CreateRotationY(Rotation.Y + rotation.Y)
                 * Matrix4.CreateRotationZ(Rotation.Z + rotation.Z);
             Matrix4 s = Matrix4.CreateScale(Scale * scale);
-            return t * r * s;
+            return s * r * t;
         }
 
         /// <exception cref="ArgumentException"></exception>

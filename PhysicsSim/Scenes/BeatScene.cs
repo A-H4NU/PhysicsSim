@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 
 namespace PhysicsSim.Scenes
 {
-    public class BeatScene : Scene
+    public sealed class BeatScene : Scene
     {
 
         public float Frequency1,Frequency2;
@@ -100,8 +100,8 @@ namespace PhysicsSim.Scenes
 
         protected override void OnResize(object sender, EventArgs e)
         {
-            _buttons["start1"].Area = new RectangleF(_window.Width / 2f - 75f, -_window.Height / 2f + 15f, 60f, 60f);
-            _buttons["start2"].Area = new RectangleF(_window.Width / 2f - 145f, -_window.Height / 2f + 15f, 60f, 60f);
+            _buttons["start1"].Area = new RectangleF(Window.Width / 2f - 75f, -Window.Height / 2f + 15f, 60f, 60f);
+            _buttons["start2"].Area = new RectangleF(Window.Width / 2f - 145f, -Window.Height / 2f + 15f, 60f, 60f);
         }
 
         protected override void OnClosed(object sender, EventArgs e)
@@ -123,11 +123,11 @@ namespace PhysicsSim.Scenes
             _buttons.Add(
                 "start1",
                 new RectangularButton(
-                    new RectangleF(_window.Width / 2f - 75f, -_window.Height / 2f + 15f, 60f, 60f),
+                    new RectangleF(Window.Width / 2f - 75f, -Window.Height / 2f + 15f, 60f, 60f),
                     ARectangularInteraction.DefaultLineWidth,
                     Color4.Gray,
                     Color4.White,
-                    _window.ColoredProgram));
+                    Window.ColoredProgram));
             _buttons["start1"].ButtonPressEvent += (o, a) =>
             {
                 _working1 ^= true;
@@ -138,11 +138,11 @@ namespace PhysicsSim.Scenes
             _buttons.Add(
                 "start2",
                 new RectangularButton(
-                    new RectangleF(_window.Width / 2f - 145f, -_window.Height / 2f + 15f, 60f, 60f),
+                    new RectangleF(Window.Width / 2f - 145f, -Window.Height / 2f + 15f, 60f, 60f),
                     ARectangularInteraction.DefaultLineWidth,
                     Color4.Gray,
                     Color4.White,
-                    _window.ColoredProgram));
+                    Window.ColoredProgram));
             _buttons["start2"].ButtonPressEvent += (o, a) =>
             {
                 _working2 ^= true;
@@ -157,7 +157,7 @@ namespace PhysicsSim.Scenes
             if (!Enabled) return;
             // Clear the used buffer to paint a new frame onto it
             GL.Clear(ClearBufferMask.ColorBufferBit);
-            Console.WriteLine(_window.Width);
+            Console.WriteLine(Window.Width);
             // Declare that we will use this program
             //GL.UseProgram(_window.ColoredProgram);
             // Get projection matrix and make shaders to compute with this matrix
@@ -170,7 +170,7 @@ namespace PhysicsSim.Scenes
                 button.Render(ref projection);
             }
 
-            _window.SwapBuffers();
+            Window.SwapBuffers();
         }
 
         protected override void OnMouseDown(object sender, MouseButtonEventArgs e)
@@ -179,14 +179,14 @@ namespace PhysicsSim.Scenes
             {
                 return;
             }
-            var pos = MainWindow.ScreenToCoord(e.X, e.Y, _window.Width, _window.Height);
+            var pos = MainWindow.ScreenToCoord(e.X, e.Y, Window.Width, Window.Height);
             _buttons["start1"].PressIfInside(pos);
             _buttons["start2"].PressIfInside(pos);
         }
 
         private Matrix4 GetProjection()
         {
-            return Matrix4.CreateOrthographic(_window.Width, _window.Height, -1f, 1f);
+            return Matrix4.CreateOrthographic(Window.Width, Window.Height, -1f, 1f);
         }
 
         protected override void OnUpdateFrame(object sender, FrameEventArgs e)
@@ -202,13 +202,13 @@ namespace PhysicsSim.Scenes
             {
                 _time2 += 1000f;
             }
-            _line = new RenderObject(ObjectFactory.Curve(WaveLine(100f, speed, 6f, 7f , _window.Width, time), Color4.WhiteSmoke), _window.ColoredProgram);
+            _line = new RenderObject(ObjectFactory.Curve(WaveLine(100f, speed, 6f, 7f , Window.Width, time), Color4.WhiteSmoke), Window.ColoredProgram);
         }
 
         private System.Numerics.Vector2 ScreenToCoord(int x, int y)
             => new System.Numerics.Vector2(
-                x - _window.Width / 2f,
-                -y + _window.Height / 2f
+                x - Window.Width / 2f,
+                -y + Window.Height / 2f
                 );
     }
 }

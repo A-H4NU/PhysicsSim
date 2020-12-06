@@ -37,10 +37,10 @@ namespace PhysicsSim.Scenes
 
         private List<List<System.Numerics.Vector2>> _lines;
         private List<RPhysicalObject> _pObjs;
+        private RPhysicalObject _selected = null;
+        private RenderObject _selectMarker;
 
         private bool _rendering = false;
-
-        private RPhysicalObject _selected = null;
 
         public ElectroScene(MainWindow window)
             : base(window)
@@ -53,6 +53,13 @@ namespace PhysicsSim.Scenes
 
         protected override void OnLoad(object sender, EventArgs e)
         {
+            _selectMarker = new RenderObject(
+                ObjectFactory.HollowCircle(
+                    RPhysicalObject.Radius * 1.2f,
+                    RPhysicalObject.BorderThickness * 1.2f,
+                    Color4.GreenYellow,
+                    ObjectFactory.BorderType.Outter),
+                Window.ColoredProgram);
         }
 
         protected override void OnClosed(object sender, EventArgs e)
@@ -71,10 +78,6 @@ namespace PhysicsSim.Scenes
                 return;
             }
             Time += (float)e.Time;
-
-            
-
-            
         }
 
         protected override void OnRenderFrame(object sender, FrameEventArgs e)
@@ -89,16 +92,16 @@ namespace PhysicsSim.Scenes
             GL.Clear(ClearBufferMask.ColorBufferBit);
 
             // Declare that we will use this program
-            GL.UseProgram(_window.ColoredProgram);
+            GL.UseProgram(Window.ColoredProgram);
             // Get projection matrix and make shaders to compute with this matrix
-            Matrix4 projection = MainWindow.GetProjection(_window.Width, _window.Height);
+            Matrix4 projection = MainWindow.GetProjection(Window.Width, Window.Height);
 
             // Render all objects, overlaying other objects rendered before
             foreach (var l in _lines)
             {
                 var ro = new RenderObject(
                              ObjectFactory.Curve(l, Color4.White),
-                             _window.ColoredProgram)
+                             Window.ColoredProgram)
                          {
                             Scale = new Vector3(Scale, Scale, 1)
                          };
@@ -111,8 +114,13 @@ namespace PhysicsSim.Scenes
                 obj.Render(ref projection);
             }
 
+            if (_selected != null)
+            {
+                _selectMarker.Render(ref projection);
+            }
+
             // Swap buffers (currently painting buffer and the buffer that is displayed now)
-            _window.SwapBuffers();
+            Window.SwapBuffers();
 
             _rendering = false;
         }
@@ -128,7 +136,7 @@ namespace PhysicsSim.Scenes
                 return;
             }
 
-            System.Numerics.Vector2 pos = MainWindow.ScreenToCoord(e.X, e.Y, _window.Width, _window.Height) / Scale;
+            System.Numerics.Vector2 pos = MainWindow.ScreenToCoord(e.X, e.Y, Window.Width, Window.Height) / Scale;
             if (e.Button == MouseButton.Left)
             {
                 bool s = false;
@@ -147,26 +155,24 @@ namespace PhysicsSim.Scenes
                 if (!s)
                 {
                     MovableObject obj = new MovableObject(pos);
-                    var rpo = new RPhysicalObject(obj, _window.ColoredProgram);
+                    var rpo = new RPhysicalObject(obj, Window.ColoredProgram);
                     _pObjs.Add(rpo);
                     _selected = rpo;
                     Console.WriteLine($"Added object at {pos}");
                 }
+                _selectMarker.Position = new Vector3(_selected.PObject.Position.X, _selected.PObject.Position.Y, 0f) * Scale;
             }
         }
 
         protected override void OnMouseMove(object sender, MouseMoveEventArgs e)
         {
-            if (!Enabled)
-            {
-                return;
-            }
-
-            System.Numerics.Vector2 pos = MainWindow.ScreenToCoord(e.X, e.Y, _window.Width, _window.Height) / Scale;
+            if (!Enabled) return;
+            System.Numerics.Vector2 pos = MainWindow.ScreenToCoord(e.X, e.Y, Window.Width, Window.Height) / Scale;
             if (_selected != null && e.Mouse.IsButtonDown(MouseButton.Left))
             {
                 ((MovableObject)_selected.PObject).PositionM = pos;
                 DrawElectricLines(true);
+                _selectMarker.Position = new Vector3(pos.X, pos.Y, 0) * Scale;
             }
         }
 
@@ -203,18 +209,6 @@ namespace PhysicsSim.Scenes
             {
                 return;
             }
-
-            if (e.Key == Key.F11)
-            {
-                if (_window.WindowState != WindowState.Fullscreen)
-                {
-                    _window.WindowState = WindowState.Fullscreen;
-                }
-                else
-                {
-                    _window.WindowState = WindowState.Normal;
-                }
-            }
             if (e.Key == Key.F)
             {
                 DrawElectricLines(false);
@@ -250,7 +244,7 @@ namespace PhysicsSim.Scenes
                             initPos: obj.PObject.Position + delta,  // starting point of the line
                             endFunc: (t, v)                         // ending function (calculation stops if true)
                                 => t > MaxT ||
-                                !(-_window.Width / Scale < v.X && v.X < _window.Width / Scale && -_window.Height / Scale < v.Y && v.Y < _window.Height / Scale),
+                                !(-Window.Width / Scale < v.X && v.X < Window.Width / Scale && -Window.Height / Scale < v.Y && v.Y < Window.Height / Scale),
                             startFromNegative: false,               // is starting from negative charge
                             delta: 1e-3f);
                     }
@@ -261,7 +255,7 @@ namespace PhysicsSim.Scenes
                             initPos: obj.PObject.Position + delta,  // starting point of the line
                             endFunc: (t, v)                         // ending function (calculation stops if true)
                                 => t > MaxT ||
-                                !(-_window.Width / Scale < v.X && v.X < _window.Width / Scale && -_window.Height / Scale < v.Y && v.Y < _window.Height / Scale),
+                                !(-Window.Width / Scale < v.X && v.X < Window.Width / Scale && -Window.Height / Scale < v.Y && v.Y < Window.Height / Scale),
                             startFromNegative: false,               // is starting from negative charge
                             delta: 1e-3f);
                     }
@@ -305,10 +299,7 @@ namespace PhysicsSim.Scenes
             {
                 obj.Dispose();
             }
-            //foreach (RenderObject obj in _lines)
-            //{
-            //    obj.Dispose();
-            //}
+            _selected = null;
             _pObjs.Clear();
             _lines.Clear();
         }

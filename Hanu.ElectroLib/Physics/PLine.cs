@@ -11,7 +11,6 @@ namespace Hanu.ElectroLib.Physics
 {
     public static class PLine
     {
-#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
         /// <summary>
         /// Calculate the electric field line asynchronously
         /// </summary>
@@ -25,7 +24,6 @@ namespace Hanu.ElectroLib.Physics
         {
             return Task.Factory.StartNew(() => ElectricFieldLine(system, initPos, endFunc, startFromNegative, delta));
         }
-#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
 
         /// <summary>
         /// Calculate the electric field line

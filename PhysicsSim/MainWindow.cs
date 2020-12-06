@@ -41,7 +41,6 @@ namespace PhysicsSim
             _timer.Elapsed += (o, e) => Console.WriteLine($"total memory using at {e.SignalTime:HH:mm:ss:fff}: {GC.GetTotalMemory(true)} bytes");
             _timer.Start();
 
-            //_es = new MenuScene(this) { Enabled = true };
             _es = new MenuScene(this) { Enabled = true };
 
             _title = "PhysicsSim";
@@ -187,5 +186,11 @@ namespace PhysicsSim
         /// <returns>System coordinate</returns>
         public static System.Numerics.Vector2 ScreenToCoord(int x, int y, float width, float height)
             => new System.Numerics.Vector2(x - width / 2f, -y + height / 2f);
+
+        public override void Dispose()
+        {
+            base.Dispose();
+            _timer.Dispose();
+        }
     }
 }

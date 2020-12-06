@@ -60,31 +60,31 @@ namespace PhysicsSim.Scenes
 
         protected override void OnResize(object sender, EventArgs e)
         {
-            _wave.Scale = new Vector3(_window.Width / _length, 1, 1);
-            _startButton.Area = new RectangleF(_window.Width / 2f - 75f, -_window.Height / 2f + 15f, 60f, 60f);
-            _timeSlipCheck.Area = new RectangleF(_window.Width / 2f - _startButton.Width - 105f, -_window.Height / 2f + 15f, 60f, 60f);
-            _ampLines.Scale = new Vector3(_window.Width / _length, 1, 1);
+            _wave.Scale = new Vector3(Window.Width / _length, 1, 1);
+            _startButton.Area = new RectangleF(Window.Width / 2f - 75f, -Window.Height / 2f + 15f, 60f, 60f);
+            _timeSlipCheck.Area = new RectangleF(Window.Width / 2f - _startButton.Width - 105f, -Window.Height / 2f + 15f, 60f, 60f);
+            _ampLines.Scale = new Vector3(Window.Width / _length, 1, 1);
             _freqSlider.Position = new Vector3(
-                -_window.Width / 2f + _freqSlider.Width / 2f + 15f,
-                -_window.Height / 2f + _freqSlider.Height / 2f + 15f, 0f);
+                -Window.Width / 2f + _freqSlider.Width / 2f + 15f,
+                -Window.Height / 2f + _freqSlider.Height / 2f + 15f, 0f);
             _speedSlider.Position = new Vector3(
-                -_window.Width / 2f + _speedSlider.Width / 2f + 15f,
-                -_window.Height / 2f + _freqSlider.Height + _speedSlider.Height / 2f + 30f, 0f);
+                -Window.Width / 2f + _speedSlider.Width / 2f + 15f,
+                -Window.Height / 2f + _freqSlider.Height + _speedSlider.Height / 2f + 30f, 0f);
             _freqText.Position = new Vector3(
-                -_window.Width / 2f + _freqSlider.Width + _freqText.Width / 2f + 30f,
-                -_window.Height / 2f + _freqSlider.Height / 2f + 15f, 0f);
+                -Window.Width / 2f + _freqSlider.Width + _freqText.Width / 2f + 30f,
+                -Window.Height / 2f + _freqSlider.Height / 2f + 15f, 0f);
             _lengthText.Position = new Vector3(
-                -_window.Width / 2f + _lengthText.Width / 2f + 15f,
-                _window.Height / 2f - _lengthText.Height / 2f - 15f, 0f);
+                -Window.Width / 2f + _lengthText.Width / 2f + 15f,
+                Window.Height / 2f - _lengthText.Height / 2f - 15f, 0f);
             _speedText.Position = new Vector3(
-                -_window.Width / 2f + _speedSlider.Width + _speedText.Width / 2f + 30f,
-                -_window.Height / 2f + _freqText.Height + _speedText.Height / 2f + 45f, 0f);
+                -Window.Width / 2f + _speedSlider.Width + _speedText.Width / 2f + 30f,
+                -Window.Height / 2f + _freqText.Height + _speedText.Height / 2f + 45f, 0f);
             _timeSlipLabel.Position = new Vector3(
-                _window.Width / 2f - _startButton.Width + _timeSlipCheck.Width / 2f - 105f,
-                -_window.Height / 2f + _timeSlipCheck.Height + 30f, 0f);
+                Window.Width / 2f - _startButton.Width + _timeSlipCheck.Width / 2f - 105f,
+                -Window.Height / 2f + _timeSlipCheck.Height + 30f, 0f);
             _startLabel.Position = new Vector3(
-                _window.Width / 2f + _startButton.Width / 2f - 75f,
-                -_window.Height / 2f + _startButton.Height + 30f, 0f);
+                Window.Width / 2f + _startButton.Width / 2f - 75f,
+                -Window.Height / 2f + _startButton.Height + 30f, 0f);
         }
 
         protected override void OnClosed(object sender, EventArgs e)
@@ -98,20 +98,20 @@ namespace PhysicsSim.Scenes
 
             _wave = new RenderObject(
                 ObjectFactory.Curve(
-                    FunctionToCurve((x) => 0f, -_length * 1f, _length * 1f),
+                    FunctionToCurve((x) => 0f, -_length * 1f, _length * 1f, 1280),
                     Color4.White),
                 WaveProgram)
             {
-                Scale = new Vector3(_window.Width / _length, 1, 1)
+                Scale = new Vector3(Window.Width / _length, 1, 1)
             };
 
             ///// BUTTONS /////
             _startButton = new RectangularButton(
-                                new RectangleF(_window.Width / 2f - 75f, -_window.Height / 2f + 15f, 60f, 60f),
+                                new RectangleF(Window.Width / 2f - 75f, -Window.Height / 2f + 15f, 60f, 60f),
                                 ARectangularInteraction.DefaultLineWidth,
                                 Color4.Gray,
                                 Color4.White,
-                                _window.ColoredProgram);
+                                Window.ColoredProgram);
             _startButton.ButtonPressEvent += (o, a) =>
             {
                 _working ^= true;
@@ -120,13 +120,13 @@ namespace PhysicsSim.Scenes
             ///////////////////
 
             ///// CHECKBOX /////
-            _timeSlipCheck = new RectangularCheckBox(60f, 60f, 5f, Color4.Black, Color4.White, Color4.Red, _window.ColoredProgram);
+            _timeSlipCheck = new RectangularCheckBox(60f, 60f, 5f, Color4.Black, Color4.White, Color4.Red, Window.ColoredProgram);
             ////////////////////
 
             ///// CIRCLES /////
             Color4 colorC = new Color4(0xCA, 0xC0, 0x3E, 128);
-            _circleL = new RenderObject(ObjectFactory.FilledCircle(20f, colorC), _window.ColoredProgram);
-            _circleR = new RenderObject(ObjectFactory.FilledCircle(20f, colorC), _window.ColoredProgram);
+            _circleL = new RenderObject(ObjectFactory.FilledCircle(20f, colorC), Window.ColoredProgram);
+            _circleR = new RenderObject(ObjectFactory.FilledCircle(20f, colorC), Window.ColoredProgram);
             ///////////////////
 
             Color4 colorL = new Color4(0.5f, 0.5f, 0.2f, 1.0f);
@@ -137,33 +137,33 @@ namespace PhysicsSim.Scenes
                         colorL,
                         new System.Numerics.Vector2(-0.5f * _length, +_amplitude / 0.1f),
                         new System.Numerics.Vector2(+0.5f * _length, +_amplitude / 0.1f)),
-                    _window.ColoredProgram),
+                    Window.ColoredProgram),
                 new RenderObject(
                     ObjectFactory.Curve(
                         colorL,
                         new System.Numerics.Vector2(-0.5f * _length, -_amplitude / 0.1f),
                         new System.Numerics.Vector2(+0.5f * _length, -_amplitude / 0.1f)),
-                    _window.ColoredProgram),
+                    Window.ColoredProgram),
                 new RenderObject(
                     ObjectFactory.Curve(
                         new Color4(1f, 1f, 1f, 0.3f),
                         new System.Numerics.Vector2(-0.5f * _length, 0f),
                         new System.Numerics.Vector2(+0.5f * _length, 0f)),
-                    _window.ColoredProgram)
+                    Window.ColoredProgram)
             })
             {
-                Scale = new Vector3(_window.Width / _length, 1, 1)
+                Scale = new Vector3(Window.Width / _length, 1, 1)
             };
 
             ///// SLIDERS /////
-            _freqSlider = new StandardSlider(400, 50, 20, 0, 5f, Color4.LightBlue, Color4.White, _window.ColoredProgram);
+            _freqSlider = new StandardSlider(400, 50, 20, 0, 5f, Color4.LightBlue, Color4.White, Window.ColoredProgram);
             _freqSlider.ValueChangedEvent += (o, ev) =>
             {
                 _frequency = ev.NewValue;
                 _freqText.Text = $"f={ev.NewValue:0.000} Hz";
                 UniformComponents();
             };
-            _speedSlider = new StandardSlider(400, 50, 20, 0, 200, Color4.LightBlue, Color.White, _window.ColoredProgram) { Value = 100f };
+            _speedSlider = new StandardSlider(400, 50, 20, 0, 200, Color4.LightBlue, Color.White, Window.ColoredProgram) { Value = 100f };
             _speedSlider.ValueChangedEvent += (o, ev) =>
             {
                 _speed = ev.NewValue;
@@ -174,11 +174,11 @@ namespace PhysicsSim.Scenes
 
             ////// TEXTS ////// 
             string fontName = "Time New Roman";
-            _freqText = new RenderText(25, fontName, "f=0.000 Hz", Color.Transparent, Color.White, _window.TexturedProgram);
-            _speedText = new RenderText(25, fontName, "v=100.00 m/s", Color.Transparent, Color.White, _window.TexturedProgram);
-            _lengthText = new RenderText(25, fontName, "L=100.00 m", Color.Transparent, Color.White, _window.TexturedProgram);
-            _timeSlipLabel = new RenderText(10, fontName, "timeslip", Color.Transparent, Color.White, _window.TexturedProgram);
-            _startLabel = new RenderText(10, fontName, "start", Color.Transparent, Color.White, _window.TexturedProgram);
+            _freqText = new RenderText(25, fontName, "f=0.000 Hz", Color.Transparent, Color.White, Window.TexturedProgram);
+            _speedText = new RenderText(25, fontName, "v=100.00 m/s", Color.Transparent, Color.White, Window.TexturedProgram);
+            _lengthText = new RenderText(25, fontName, "L=100.00 m", Color.Transparent, Color.White, Window.TexturedProgram);
+            _timeSlipLabel = new RenderText(10, fontName, "timeslip", Color.Transparent, Color.White, Window.TexturedProgram);
+            _startLabel = new RenderText(10, fontName, "start", Color.Transparent, Color.White, Window.TexturedProgram);
             //////////////////
 
             UniformComponents();
@@ -192,7 +192,7 @@ namespace PhysicsSim.Scenes
             }
             GL.Clear(ClearBufferMask.ColorBufferBit);
 
-            Matrix4 projection = MainWindow.GetProjection(_window.Width, _window.Height);
+            Matrix4 projection = MainWindow.GetProjection(Window.Width, Window.Height);
             _ampLines.Render(ref projection);
             GL.UseProgram(WaveProgram);
             GL.Uniform1(24, Time);
@@ -209,7 +209,7 @@ namespace PhysicsSim.Scenes
             _timeSlipLabel.Render(ref projection);
             _startLabel.Render(ref projection);
 
-            _window.SwapBuffers();
+            Window.SwapBuffers();
         }
 
         protected override void OnUpdateFrame(object sender, FrameEventArgs e)
@@ -220,14 +220,14 @@ namespace PhysicsSim.Scenes
             }
             if (_working)
             {
-                Time += (_timeSlipCheck.IsChecked ? 3 : 1) * (float)e.Time;
+                Time += (_timeSlipCheck.IsChecked ? 5 : 1) * (float)e.Time;
             }
             else
             {
                 Time = 0f;
             }
-            _circleL.Position = new Vector3(-.5f * _window.Width, WaveFunc(-.5f * _length), 0);
-            _circleR.Position = new Vector3(+.5f * _window.Width, WaveFunc(+.5f * _length), 0);
+            _circleL.Position = new Vector3(-.5f * Window.Width, WaveFunc(-.5f * _length), 0);
+            _circleR.Position = new Vector3(+.5f * Window.Width, WaveFunc(+.5f * _length), 0);
         }
 
         protected override void OnMouseDown(object sender, MouseButtonEventArgs e)
@@ -236,7 +236,7 @@ namespace PhysicsSim.Scenes
             {
                 return;
             }
-            var pos = MainWindow.ScreenToCoord(e.X, e.Y, _window.Width, _window.Height);
+            var pos = MainWindow.ScreenToCoord(e.X, e.Y, Window.Width, Window.Height);
             _startButton.PressIfInside(pos);
             if (_freqSlider.SelectIfInside(pos))
             {
@@ -255,7 +255,7 @@ namespace PhysicsSim.Scenes
             {
                 return;
             }
-            var pos = MainWindow.ScreenToCoord(e.X, e.Y, _window.Width, _window.Height);
+            var pos = MainWindow.ScreenToCoord(e.X, e.Y, Window.Width, Window.Height);
             _freqSlider.Unselect();
             _speedSlider.Unselect();
         }
@@ -266,7 +266,7 @@ namespace PhysicsSim.Scenes
             {
                 return;
             }
-            var pos = MainWindow.ScreenToCoord(e.X, e.Y, _window.Width, _window.Height);
+            var pos = MainWindow.ScreenToCoord(e.X, e.Y, Window.Width, Window.Height);
             _freqSlider.SlideIfSelected(pos);
             _speedSlider.SlideIfSelected(pos);
         }
@@ -276,17 +276,6 @@ namespace PhysicsSim.Scenes
             if (!Enabled)
             {
                 return;
-            }
-            if (e.Key == Key.F11 && !e.IsRepeat)
-            {
-                if (_window.WindowState == WindowState.Fullscreen)
-                {
-                    _window.WindowState = WindowState.Normal;
-                }
-                else
-                {
-                    _window.WindowState = WindowState.Fullscreen;
-                }
             }
         }
 
@@ -358,8 +347,8 @@ namespace PhysicsSim.Scenes
             {
                 _timeSlipCheck.Toggle();
             }
-            _frequency = DefaultFrequency;
-            _speed = DefaultSpeed;
+            _freqSlider.Value = _frequency = DefaultFrequency;
+            _speedSlider.Value = _speed = DefaultSpeed;
             UniformComponents();
         }
 
