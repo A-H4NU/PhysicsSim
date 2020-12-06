@@ -16,6 +16,15 @@ namespace PhysicsSim.VBOs
 
         public static float BorderThickness = 2f;
 
+        public override Vector3 Position
+        {
+            get => base.Position;
+            set
+            {
+                base.Position = value;
+            }
+        }
+
         public PhysicalObject PObject { get; private set; }
 
         private ROCollection _renderCollection;

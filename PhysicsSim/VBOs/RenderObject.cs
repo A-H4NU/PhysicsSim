@@ -10,17 +10,19 @@ namespace PhysicsSim.VBOs
     public class RenderObject : ARenderable
     {
         private bool _initialized;
-        private readonly int _verticeCount;
+        public readonly int VerticeCount;
         private readonly int _program;
 
         private readonly int _vertexArray, _buffer;
         private readonly PrimitiveType _renderType;
 
+        public bool Initialized { get => _initialized; }
+
         public RenderObject((ColoredVertex[] vertices, PrimitiveType renderType) tuple, int program)
         {
             ColoredVertex[] vertices = tuple.vertices;
             _renderType = tuple.renderType;
-            _verticeCount = vertices.Length;
+            VerticeCount = vertices.Length;
             _program = program;
 
             _vertexArray = GL.GenVertexArray();
@@ -31,7 +33,7 @@ namespace PhysicsSim.VBOs
 
             GL.NamedBufferStorage(
                 _buffer,
-                ColoredVertex.SIZE * _verticeCount,
+                ColoredVertex.SIZE * VerticeCount,
                 vertices,
                 BufferStorageFlags.MapWriteBit);
 
@@ -68,7 +70,7 @@ namespace PhysicsSim.VBOs
             GL.UniformMatrix4(MainWindow.ProjectionLocation, false, ref projection);
             GL.BindVertexArray(_vertexArray);
             GL.BindBuffer(BufferTarget.ArrayBuffer, _buffer);
-            GL.DrawArrays(_renderType, 0, _verticeCount);
+            GL.DrawArrays(_renderType, 0, VerticeCount);
         }
 
         protected virtual void Dispose(bool disposing)

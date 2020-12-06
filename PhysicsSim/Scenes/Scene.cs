@@ -9,6 +9,8 @@ namespace PhysicsSim.Scenes
     {
         protected readonly MainWindow _window;
 
+        protected MainWindow Window { get => _window; }
+
         public float Time;
 
         public bool Enabled { get; set; } = false;
@@ -44,7 +46,10 @@ namespace PhysicsSim.Scenes
         /// Called before <see cref="OnRenderFrame(FrameEventArgs)"/>, to update variables by time and input
         /// <para>Do work only when <see cref="Enabled"/> == <see cref="true"/></para>
         /// </summary>
-        protected abstract void OnUpdateFrame(object sender, FrameEventArgs e);
+        protected virtual void OnUpdateFrame(object sender, FrameEventArgs e)
+        {
+            Time += (float)e.Time;
+        }
 
         /// <summary>
         /// Called to do render works

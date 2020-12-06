@@ -11,7 +11,6 @@ namespace Hanu.ElectroLib.Physics
 {
     public static class PLine
     {
-#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
         /// <summary>
         /// Calculate the electric field line asynchronously
         /// </summary>
@@ -21,9 +20,10 @@ namespace Hanu.ElectroLib.Physics
         /// <param name="startFromNegative">whether or not starting from negative charged object</param>
         /// <param name="delta">small step of calculation, the smaller, the better</param>
         /// <returns>the task that returns the list of points that represent the electric field line</returns>
-        public async static Task<List<Vector2>> ElectricFieldLineAsync(IEnumerable<PhysicalObject> system, Vector2 initPos, Func<float, Vector2, bool> endFunc, bool startFromNegative, float delta = 1e-3f)
-            => ElectricFieldLine(system, initPos, endFunc, startFromNegative, delta);
-#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
+        public static Task<List<Vector2>> ElectricFieldLineAsync(IEnumerable<PhysicalObject> system, Vector2 initPos, Func<float, Vector2, bool> endFunc, bool startFromNegative, float delta = 1e-3f)
+        {
+            return Task.Factory.StartNew(() => ElectricFieldLine(system, initPos, endFunc, startFromNegative, delta));
+        }
 
         /// <summary>
         /// Calculate the electric field line
@@ -71,6 +71,40 @@ namespace Hanu.ElectroLib.Physics
             return vectorArrays;
         }
 
+        public static Task<List<Vector2>> ElectricFieldLineFastAsync(IEnumerable<PhysicalObject> system, Vector2 initPos, Func<float, Vector2, bool> endFunc, bool startFromNegative, float delta = 1e-3f)
+        {
+            return Task.Factory.StartNew(() => ElectricFieldLineFast(system, initPos, endFunc, startFromNegative, delta));
+        }
+
+        public static List<Vector2> ElectricFieldLineFast(IEnumerable<PhysicalObject> system, Vector2 initPos, Func<float, Vector2, bool> endFunc, bool startFromNegative, float delta = 1e-3f)
+        {
+            Vector2 f(float t, Vector2 v)
+            {
+                var e = PSystem.GetElectricFieldAt(system, v);
+                return e / e.Length() * 100f;
+            }
+            var result = new List<Vector2>();
+            float num1 = 0f;
+            result.Add(initPos);
+            while (!endFunc(num1, result.Last()) || Single.IsNaN(result.Last().X))
+            {
+                var vec = f(num1, initPos);
+                result.Add(initPos + delta * vec);
+                if (TryFindMatch(
+                    system,
+                    (p) => p.Charge != 0 && DistFromPointToSegment(result[result.Count-2], result.Last(), p.Position) < 0.1f,
+                    out PhysicalObject obj))
+                {
+                    result.RemoveAt(result.Count - 1);
+                    result.Add(obj.Position);
+                    break;
+                }
+                num1 += delta;
+                initPos = result.Last();
+            }
+            return result;
+        }
+
         private static bool TryFindMatch(IEnumerable<PhysicalObject> e, Func<PhysicalObject, bool> predicate, out PhysicalObject physicalObject)
         {
             foreach (PhysicalObject obj in e)
@@ -99,8 +133,5 @@ namespace Hanu.ElectroLib.Physics
             d /= d.Length();
             return (pp1 - Vector2.Dot(pp1, d) * d).Length();
         }
-
-
-        
     }
 }
