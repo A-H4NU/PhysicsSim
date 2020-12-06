@@ -18,7 +18,7 @@ namespace PhysicsSim.Scenes
     public class BeatScene : Scene
     {
 
-        public float Frequency1,Frequency2;
+        public float freq1,freq2;
 
         public static float Amplitude;
 
@@ -29,12 +29,14 @@ namespace PhysicsSim.Scenes
         private ARenderable _line;
 
         private readonly Dictionary<string, RectangularButton> _buttons;
-
+        private StandardSlider _freq1Slider, _freq2Slider;
+        private RenderText freq1Text, freq2Text;
         private static bool _working1 = false;
         public static List<float> timelist1 = new List<float>();
         public static List<float> timelist2 = new List<float>();
 
         private static bool _working2 = false;
+        private string fontName;
 
         private static float Sooth(float x)
         {
@@ -63,6 +65,7 @@ namespace PhysicsSim.Scenes
             while (vectorArrays.Count == 0 || vectorArrays.Last().X <= windowwidth / 2)
             {
                 double temp = 0f;
+
                 for (int n = 0; n< (int)(timelist1.Count / 2); n++)
                 {
                     if (x >= (time - timelist1[2*n+1]) * speed && x <= (time - timelist1[2*n]) * speed)
@@ -85,14 +88,19 @@ namespace PhysicsSim.Scenes
                     if (x >= (time - timelist2[2*n+1]) * speed && x <= (time - timelist2[2*n]) * speed)
                     {
                         float starttime2 = timelist2[2*n];
-                        temp += Amp * Math.Sin(angularFrequency2 * (time - starttime2) - wavenumber2 * x);
+                        float para2 = angularFrequency2 * (time - starttime2) - wavenumber2 * x;
+                        float endtime2 = timelist2[2*n+1];
+                        float para2rev = angularFrequency2 * (endtime2-time) + wavenumber2 * x;
+                        temp += Amp * Sooth(para2rev) * Sooth(para2) * Math.Sin(para2);
                         break;
                     }
                 }
                 if (timelist2.Count % 2 == 1 && x <= (time - timelist2.Last()) * speed)
                 {
                     float starttime2 = timelist2.Last();
-                    temp += Amp * Math.Sin(angularFrequency2 * (time - starttime2) - wavenumber2 * x);
+                    float para2 = angularFrequency2 * (time - starttime2) - wavenumber2 * x;
+                    
+                    temp += Amp * Sooth(para2) * Math.Sin(para2);
                 }
 
                 i.X = x - windowwidth/2 ;
@@ -152,9 +160,16 @@ namespace PhysicsSim.Scenes
                     _window.ColoredProgram));
             _buttons["start1"].ButtonPressEvent += (o, a) =>
             {
-                _working1 ^= true;
-                //_time1 = 0f;
-                timelist1.Add(time);
+                if (timelist1.Count() == 0)
+                {
+                    timelist1.Add(time);
+                    timelist1.Add(time + 3f);
+                }
+                if (time > timelist1.Last())
+                {
+                    timelist1.Add(time);
+                    timelist1.Add(time + 3f);
+                }
                 _buttons["start1"].FillColor = _working1 ? Color4.Red : Color4.Gray;
             };
 
@@ -168,12 +183,38 @@ namespace PhysicsSim.Scenes
                     _window.ColoredProgram));
             _buttons["start2"].ButtonPressEvent += (o, a) =>
             {
-                _working2 ^= true;
-                //_time2 = 0f;
-                timelist2.Add(time);
+                if(timelist2.Count() == 0)
+                {
+                    timelist2.Add(time);
+                    timelist2.Add(time + 3f);
+                }
+                if(time > timelist2.Last())
+                {
+                    timelist2.Add(time);
+                    timelist2.Add(time + 3f);
+                }
+                
                 _buttons["start2"].FillColor = _working2 ? Color4.Red : Color4.Gray;
             };
             ///////////////////
+            ///
+            _freq1Slider = new StandardSlider(400, 50, 20, 0, 5f, Color4.LightBlue, Color4.White, _window.ColoredProgram);
+            _freq1Slider.ValueChangedEvent += (o, ev) =>
+            {
+                freq1 = ev.NewValue;
+                freq1Text.Text = $"f1={ev.NewValue:0.000} Hz";
+                
+            };
+            _freq2Slider = new StandardSlider(400, 50, 20, 0, 200, Color4.LightBlue, Color.White, _window.ColoredProgram) { Value = 100f };
+            _freq2Slider.ValueChangedEvent += (o, ev) =>
+            {
+                freq2 = ev.NewValue;
+                freq2Text.Text = $"f2={ev.NewValue:000.00} Hz";
+                
+            };
+
+            freq1Text = new RenderText(25, fontName, "f=0.000 Hz", Color.Transparent, Color.White, _window.TexturedProgram);
+            freq2Text = new RenderText(25, fontName, "f=0.000 Hz", Color.Transparent, Color.White, _window.TexturedProgram);
         }
 
         protected override void OnRenderFrame(object sender, FrameEventArgs e)
@@ -216,15 +257,32 @@ namespace PhysicsSim.Scenes
         {
             if (!Enabled) return;
             time += (float)e.Time;
-            if (_working1)
+            if (timelist2.Count()!=0)
             {
-                //_time1 += (float)e.Time;
+                if (time <= timelist2.Last())
+                {
+                    _working2 = true;
+                }
+                else
+                {
+                    _working2 = false;
+                }
+                _buttons["start2"].FillColor = _working2 ? Color4.Red : Color4.Gray;
             }
-            if (_working2)
+
+            if (timelist1.Count()!=0)
             {
-                //_time2 += (float)e.Time;
+                if (time <= timelist1.Last())
+                {
+                    _working1 = true;
+                }
+                else
+                {
+                    _working1 = false;
+                }
+                _buttons["start1"].FillColor = _working1 ? Color4.Red : Color4.Gray;
             }
-            _line = new RenderObject(ObjectFactory.Curve(WaveLine(100f, speed, 6f, 7f , _window.Width, time), Color4.WhiteSmoke), _window.ColoredProgram);
+            _line = new RenderObject(ObjectFactory.Curve(WaveLine(100f, speed, freq1, freq2 , _window.Width, time), Color4.WhiteSmoke), _window.ColoredProgram);
         }
 
         private System.Numerics.Vector2 ScreenToCoord(int x, int y)
