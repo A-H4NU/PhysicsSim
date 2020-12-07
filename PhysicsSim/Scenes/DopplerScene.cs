@@ -177,7 +177,6 @@ namespace PhysicsSim.Scenes
             _oArrow?.Render(ref projection);
             _source.Render(ref projection);
             _observer.Render(ref projection);
-            _button.Render(ref projection);
 
             int n = _waves.Count;
             for (int i = 0; i < n; ++i)
@@ -188,6 +187,8 @@ namespace PhysicsSim.Scenes
                 ro.Render(ref projection);
                 ro.Dispose();
             }
+
+            _button.Render(ref projection);
 
             Window.SwapBuffers();
         }

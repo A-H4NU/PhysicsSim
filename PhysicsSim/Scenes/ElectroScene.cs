@@ -221,6 +221,7 @@ namespace PhysicsSim.Scenes
         {
             if (!_pObjs.Any((p) => p.PObject.Charge != 0f))
             {
+                _lines.Clear();
                 return;
             }
             var tasklist = new List<Task<List<System.Numerics.Vector2>>>();
@@ -244,7 +245,8 @@ namespace PhysicsSim.Scenes
                             initPos: obj.PObject.Position + delta,  // starting point of the line
                             endFunc: (t, v)                         // ending function (calculation stops if true)
                                 => t > MaxT ||
-                                !(-Window.Width / Scale < v.X && v.X < Window.Width / Scale && -Window.Height / Scale < v.Y && v.Y < Window.Height / Scale),
+                                !(-Window.Width / Scale < v.X && v.X < Window.Width / Scale &&
+                                  -Window.Height / Scale < v.Y && v.Y < Window.Height / Scale),
                             startFromNegative: false,               // is starting from negative charge
                             delta: 1e-3f);
                     }
@@ -255,7 +257,8 @@ namespace PhysicsSim.Scenes
                             initPos: obj.PObject.Position + delta,  // starting point of the line
                             endFunc: (t, v)                         // ending function (calculation stops if true)
                                 => t > MaxT ||
-                                !(-Window.Width / Scale < v.X && v.X < Window.Width / Scale && -Window.Height / Scale < v.Y && v.Y < Window.Height / Scale),
+                                !(-Window.Width / Scale < v.X && v.X < Window.Width / Scale &&
+                                  -Window.Height / Scale < v.Y && v.Y < Window.Height / Scale),
                             startFromNegative: false,               // is starting from negative charge
                             delta: 1e-3f);
                     }

@@ -149,6 +149,11 @@ namespace PhysicsSim.Scenes
                 {
                     Window.WindowState = WindowState.Fullscreen;
                 }
+                RearrangeButtons();
+            }
+            if (e.Key == Key.R && !e.IsRepeat)
+            {
+                RearrangeButtons();
             }
         }
 

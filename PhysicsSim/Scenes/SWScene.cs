@@ -98,7 +98,7 @@ namespace PhysicsSim.Scenes
 
             _wave = new RenderObject(
                 ObjectFactory.Curve(
-                    FunctionToCurve((x) => 0f, -_length * 1f, _length * 1f, 1280),
+                    FunctionToCurve((x) => 0f, -_length * 1f, _length * 1f, 1600),
                     Color4.White),
                 WaveProgram)
             {
