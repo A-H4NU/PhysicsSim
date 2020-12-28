@@ -127,7 +127,6 @@ namespace PhysicsSim.VBOs
                         c.Dispose();
                     }
                 }
-                charMap.Save("chars.jpg", ImageFormat.Jpeg);
                 return charMap;
             }
         }
