@@ -119,6 +119,10 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
+    <Content Include="Instructions\Slide1.PNG" />
+    <Content Include="Instructions\Slide2.PNG" />
+    <Content Include="Instructions\Slide3.PNG" />
+    <Content Include="Instructions\Slide4.PNG" />
     <Content Include="OpenAL32.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
