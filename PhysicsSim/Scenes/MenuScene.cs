@@ -20,6 +20,8 @@ namespace PhysicsSim.Scenes
         private readonly List<TexturedButton> _buttons;
 
         private readonly List<Scene> _scenes;
+
+        private RenderText _creditText;
         
         public MenuScene(MainWindow window) : base(window)
         {
@@ -39,6 +41,7 @@ namespace PhysicsSim.Scenes
             base.OnResize(sender, e);
 
             RearrangeButtons();
+            _creditText.Position = new Vector3(Window.Width / 2f - _creditText.Width / 2f, -Window.Height / 2f + _creditText.Height / 2f, 0f);
         }
 
         protected override void OnLoad(object sender, EventArgs e)
@@ -56,6 +59,7 @@ namespace PhysicsSim.Scenes
                 int idx = i;
                 _buttons[i].ButtonPressEvent += (o, _) => ActivateScene(idx + 1);
             }
+            _creditText = new RenderText(15, "Arial", "by Seungwoo Han & Jaewon Jeon", Color.Transparent, Color.White, Window.TexturedProgram);
             ActivateScene(0);
             GL.Enable(EnableCap.Blend);
 
@@ -108,6 +112,8 @@ namespace PhysicsSim.Scenes
                 {
                     button.Render(ref projection);
                 }
+
+                _creditText.Render(ref projection);
 
                 Window.SwapBuffers();
             }

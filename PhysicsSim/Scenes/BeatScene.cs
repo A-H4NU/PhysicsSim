@@ -169,6 +169,9 @@ namespace PhysicsSim.Scenes
             Time = 0f;
             _working1 = false;
             _working2 = false;
+            _freq1Slider.Value = 0f;
+            _freq2Slider.Value = 0f;
+            _timeSlider.Value = 0f;
         }
 
         protected override void OnLoad(object sender, EventArgs e)

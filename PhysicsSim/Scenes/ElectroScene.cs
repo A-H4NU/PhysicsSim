@@ -42,6 +42,8 @@ namespace PhysicsSim.Scenes
 
         private bool _rendering = false;
 
+        private int _renderCount = 0;
+
         public ElectroScene(MainWindow window)
             : base(window)
         {
@@ -97,7 +99,8 @@ namespace PhysicsSim.Scenes
             Matrix4 projection = MainWindow.GetProjection(Window.Width, Window.Height);
 
             // Render all objects, overlaying other objects rendered before
-            foreach (var l in _lines)
+            var lines = new List<List<System.Numerics.Vector2>>(_lines);
+            foreach (var l in lines)
             {
                 var ro = new RenderObject(
                              ObjectFactory.Curve(l, Color4.White),
@@ -108,6 +111,8 @@ namespace PhysicsSim.Scenes
                 ro.Render(ref projection);
                 ro.Dispose();
             }
+
+            Console.WriteLine($"{lines.Count} {Enabled}");
 
             foreach (RPhysicalObject obj in _pObjs)
             {
@@ -224,6 +229,8 @@ namespace PhysicsSim.Scenes
                 _lines.Clear();
                 return;
             }
+            _renderCount += 1;
+            int currentRender = _renderCount;
             var tasklist = new List<Task<List<System.Numerics.Vector2>>>();
             var extracted = _pObjs.Extracted();
             foreach (var obj in _pObjs)
@@ -266,6 +273,7 @@ namespace PhysicsSim.Scenes
                 }
             }
 
+            // wait for all tasks to complete
             var newL = new List<List<System.Numerics.Vector2>>();
             await Task.WhenAll(tasklist);
             foreach (var task in tasklist)
@@ -273,7 +281,9 @@ namespace PhysicsSim.Scenes
                 var res = await task;
                 newL.Add(res);
             }
-
+            // if another render has started, then stash current results
+            if (_renderCount != currentRender) return;
+            // wait for OnRender finished and then replace
             while (_rendering) { }
             _lines = newL;
         }
