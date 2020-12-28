@@ -1,5 +1,5 @@
 # PhysicsSim
-Varius Physics Simulations in one executive file.
+Various physics simulations in one executive file.
 
 ## How to use
 ![alt text](https://github.com/A-H4NU/PhysicsSim/blob/master/PhysicsSim/Instructions/Slide1.PNG?raw=true)
