@@ -2,7 +2,7 @@
 Various physics simulations in one executive file.
 
 ## How to install
-1. Download the .zip file at [here](https://github.com/A-H4NU/PhysicsSim/releases/latest, "latest release")
+1. Download the .zip file at [here](https://github.com/A-H4NU/PhysicsSim/releases/latest "latest release")
 2. Extract files in the file and (do not remove or isolate anything)
 3. Execute "PhysicsSim.exe".
 4. Enjoy!
